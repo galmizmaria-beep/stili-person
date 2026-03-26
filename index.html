@@ -21,59 +21,92 @@
             color: var(--text-light);
             font-family: var(--font-main);
             margin: 0;
-            padding: 20px;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden; /* Убираем скролл всей страницы */
             background-image: radial-gradient(circle at 50% 0%, #302a1c 0%, var(--bg-dark) 60%);
         }
 
         .editor-container {
             background-color: var(--bg-panel);
-            padding: 40px;
+            padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 15px rgba(223, 178, 62, 0.1);
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
+            width: 95%; /* Занимает почти всю ширину слайда Genially */
+            max-width: 1200px;
+            height: 90vh; /* Адаптируется под высоту слайда */
+            display: flex;
+            gap: 30px;
+            box-sizing: border-box;
+        }
+
+        /* ЛЕВАЯ ПАНЕЛЬ - Настройки */
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+
+        /* КАСТОМИЗАЦИЯ СКРОЛЛБАРА ДЛЯ ЛЕВОЙ ПАНЕЛИ */
+        .left-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+        .left-panel::-webkit-scrollbar-track {
+            background: #1a1a1a; 
+            border-radius: 10px;
+        }
+        .left-panel::-webkit-scrollbar-thumb {
+            background: var(--gold); 
+            border-radius: 10px;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ - Холст */
+        .right-panel {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
         }
 
         h1 {
             font-family: var(--font-heading);
             color: var(--gold);
-            font-size: 3em;
+            font-size: 2.2em; /* Чуть уменьшили для 16:9 */
             margin-top: 0;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
 
         p.subtitle {
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: #a0a0a0;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            line-height: 1.4;
         }
 
         .controls {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             margin-bottom: 20px;
         }
 
-        input[type="file"] {
-            display: none;
-        }
+        input[type="file"] { display: none; }
 
         .custom-file-upload {
             border: 2px dashed var(--gold);
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
             cursor: pointer;
             transition: 0.3s;
             color: var(--gold);
             font-weight: 600;
+            text-align: center;
         }
 
         .custom-file-upload:hover {
@@ -82,19 +115,18 @@
 
         select, .settings-panel {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             background-color: var(--bg-dark);
             color: var(--text-light);
             border: 1px solid #444;
-            border-radius: 15px;
+            border-radius: 10px;
             font-family: var(--font-main);
-            font-size: 1em;
+            font-size: 0.9em;
             outline: none;
             box-sizing: border-box;
         }
 
         select {
-            border-radius: 25px;
             cursor: pointer;
             appearance: none;
             text-align: center;
@@ -103,7 +135,7 @@
         .settings-panel {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             text-align: left;
         }
 
@@ -114,13 +146,12 @@
         }
 
         .slider-group label {
-            font-size: 0.85em;
+            font-size: 0.8em;
             color: var(--gold);
             display: flex;
             justify-content: space-between;
         }
 
-        /* Стилизация ползунков */
         input[type=range] {
             -webkit-appearance: none;
             width: 100%;
@@ -128,12 +159,12 @@
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 16px;
-            width: 16px;
+            height: 14px;
+            width: 14px;
             border-radius: 50%;
             background: var(--gold);
             cursor: pointer;
-            margin-top: -6px;
+            margin-top: -5px;
         }
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
@@ -143,12 +174,13 @@
             border-radius: 2px;
         }
 
-        /* Стилизация палитры */
         .color-picker-group {
             display: flex;
+            flex-direction: row;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
         }
+        
         input[type="color"] {
             -webkit-appearance: none;
             border: none;
@@ -158,20 +190,47 @@
             cursor: pointer;
             background: none;
         }
-        input[type="color"]::-webkit-color-swatch-wrapper {
-            padding: 0;
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: 1px solid #444; border-radius: 5px; }
+
+        .buttons-group {
+            margin-top: auto; /* Прижимает кнопки к низу левой панели */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-        input[type="color"]::-webkit-color-swatch {
-            border: 1px solid #444;
-            border-radius: 5px;
+
+        button {
+            background-color: var(--gold);
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-family: var(--font-main);
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(223, 178, 62, 0.3);
         }
+
+        button:hover { background-color: var(--gold-hover); transform: translateY(-2px); }
+        button:disabled { background-color: #555; color: #888; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        #downloadBtn {
+            display: none;
+            background-color: transparent;
+            color: var(--gold);
+            border: 2px solid var(--gold);
+        }
+        #downloadBtn:hover { background-color: var(--gold); color: #000; }
 
         .preview-box {
             width: 100%;
-            height: 350px;
+            height: 100%; /* Занимает всю высоту правой панели */
             background-color: #000;
             border-radius: 10px;
-            margin-bottom: 30px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -201,96 +260,77 @@
             border-radius: 10px;
         }
 
-        button {
-            background-color: var(--gold);
-            color: #000;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 30px;
-            font-family: var(--font-main);
-            font-weight: 600;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(223, 178, 62, 0.3);
-        }
-
-        button:hover {
-            background-color: var(--gold-hover);
-            transform: translateY(-2px);
-        }
-
-        button:disabled {
-            background-color: #555;
-            color: #888;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
-
-        #downloadBtn {
-            display: none;
-            background-color: transparent;
-            color: var(--gold);
-            border: 2px solid var(--gold);
-        }
-
-        #downloadBtn:hover {
-            background-color: var(--gold);
-            color: #000;
+        /* Для мобильных устройств (на всякий случай) */
+        @media (max-width: 768px) {
+            .editor-container {
+                flex-direction: column;
+                height: 95vh;
+                overflow-y: auto;
+            }
+            .right-panel {
+                min-height: 300px;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="editor-container">
-    <h1>Измени персонажа</h1>
-    <p class="subtitle">Загрузите изображение на прозрачном фоне и выберите стиль магии</p>
+    <!-- ЛЕВАЯ КОЛОНКА -->
+    <div class="left-panel">
+        <div>
+            <h1>Измени персонажа</h1>
+            <p class="subtitle">Загрузите изображение на прозрачном фоне и выберите стиль магии</p>
 
-    <div class="controls">
-        <label class="custom-file-upload">
-            <input type="file" id="imageUpload" accept="image/png, image/jpeg">
-            <span id="fileName">📁 Выбрать картинку с устройства</span>
-        </label>
+            <div class="controls">
+                <label class="custom-file-upload">
+                    <input type="file" id="imageUpload" accept="image/png, image/jpeg">
+                    <span id="fileName">📁 Выбрать картинку</span>
+                </label>
 
-        <select id="styleSelect">
-            <option value="none">Оригинал (Без стиля)</option>
-            <option value="pixel">👾 8-bit Пиксель-арт</option>
-            <option value="gameboy">🎮 Ретро GameBoy</option>
-            <option value="sketch">✏️ Карандашный скетч</option>
-            <option value="popart">🎨 Поп-арт (Комикс)</option>
-            <option value="cyberpunk">🌃 Киберпанк-неон</option>
-            <option value="silhouette">🥷 Силуэт ниндзя</option>
-            <option value="ghost">👻 Призрак</option>
-            <option value="hologram">💿 Голограмма</option>
-        </select>
+                <select id="styleSelect">
+                    <option value="none">Оригинал (Без стиля)</option>
+                    <option value="pixel">👾 8-bit Пиксель-арт</option>
+                    <option value="gameboy">🎮 Ретро GameBoy</option>
+                    <option value="sketch">✏️ Карандашный скетч</option>
+                    <option value="popart">🎨 Поп-арт (Комикс)</option>
+                    <option value="cyberpunk">🌃 Киберпанк-неон</option>
+                    <option value="silhouette">🥷 Силуэт ниндзя</option>
+                    <option value="ghost">👻 Призрак</option>
+                    <option value="hologram">💿 Голограмма</option>
+                </select>
 
-        <!-- Панель настроек -->
-        <div class="settings-panel">
-            <div class="slider-group">
-                <label>Яркость <span id="brightVal">100%</span></label>
-                <input type="range" id="brightnessSlider" min="10" max="200" value="100">
+                <!-- Панель настроек -->
+                <div class="settings-panel">
+                    <div class="slider-group">
+                        <label>Яркость <span id="brightVal">100%</span></label>
+                        <input type="range" id="brightnessSlider" min="10" max="200" value="100">
+                    </div>
+                    <div class="slider-group">
+                        <label>Интенсивность свечения <span id="glowVal">0</span></label>
+                        <input type="range" id="glowSlider" min="0" max="50" value="0">
+                    </div>
+                    <div class="slider-group color-picker-group">
+                        <label for="glowColor">Цвет свечения:</label>
+                        <input type="color" id="glowColor" value="#dfb23e">
+                    </div>
+                </div>
             </div>
-            <div class="slider-group">
-                <label>Интенсивность свечения <span id="glowVal">0</span></label>
-                <input type="range" id="glowSlider" min="0" max="50" value="0">
-            </div>
-            <div class="slider-group color-picker-group">
-                <label for="glowColor">Цвет свечения:</label>
-                <input type="color" id="glowColor" value="#dfb23e">
-            </div>
+        </div>
+
+        <div class="buttons-group">
+            <button id="processBtn" disabled>Обработать картинку</button>
+            <button id="downloadBtn">Скачать файл</button>
         </div>
     </div>
 
-    <div class="preview-box">
-        <span class="placeholder-text" id="placeholder">Предпросмотр</span>
-        <canvas id="canvas"></canvas>
+    <!-- ПРАВАЯ КОЛОНКА -->
+    <div class="right-panel">
+        <div class="preview-box">
+            <span class="placeholder-text" id="placeholder">Предпросмотр</span>
+            <canvas id="canvas"></canvas>
+        </div>
     </div>
-
-    <button id="processBtn" disabled>Обработать картинку</button>
-    <button id="downloadBtn">Скачать файл на устройство</button>
 </div>
 
 <script>
@@ -312,13 +352,19 @@
 
     let originalImage = new Image();
     let isImageLoaded = false;
-    let maxCanvasSize = 800; 
+    let maxCanvasSize = 1000; // Немного увеличил разрешение для 16:9
 
     // Загрузка картинки
     imageUpload.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            fileName.textContent = '📁 ' + file.name;
+            // Обрезаем длинное имя файла, чтобы оно влезало в кнопку
+            let displayName = file.name;
+            if (displayName.length > 20) {
+                displayName = displayName.substring(0, 17) + '...';
+            }
+            fileName.textContent = '📁 ' + displayName;
+
             const reader = new FileReader();
             reader.onload = function(event) {
                 originalImage.onload = function() {
