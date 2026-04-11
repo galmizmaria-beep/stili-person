@@ -121,7 +121,7 @@
         .particle { position: absolute; border-radius: 50%; animation: floatUp linear infinite; opacity: 0; }
         @keyframes floatUp { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }
 
-        /* АНИМАЦИИ */
+        /* АНИМАЦИИ (как раньше) */
         .anim-float { animation: float var(--anim-speed) ease-in-out infinite; }
         .anim-pulse { animation: pulse calc(var(--anim-speed) / 1.5) infinite; }
         .anim-breathe { animation: breathe var(--anim-speed) ease-in-out infinite; }
@@ -256,15 +256,16 @@
 
             <!-- БЛОК: АНИМАЦИИ И ИНТЕРАКТИВ -->
             <fieldset>
-                <legend>Анимации и Интерактив</legend>
+                <legend>Анимации и Интерактив (Клик / Наведение)</legend>
                 <div class="controls">
                     <div class="slider-group">
                         <label>Скорость анимаций <span id="speedVal">Нормальная</span></label>
                         <input type="range" id="animSpeed" min="0.2" max="4" step="0.1" value="2" dir="rtl">
                     </div>
 
+                    <!-- ВСЕ АНИМАЦИИ ВОЗВРАЩЕНЫ -->
                     <select id="animContinuous">
-                        <option value="none">Покой (Без постоянной)</option>
+                        <option value="none">Покой (Без фоновой анимации)</option>
                         <option value="anim-float">🎈 Парение (Полет)</option>
                         <option value="anim-pulse">💓 Пульс (Сердцебиение)</option>
                         <option value="anim-shake">🫨 Тряска (Землетрясение)</option>
@@ -278,7 +279,7 @@
                     </select>
 
                     <select id="animHover">
-                        <option value="none">Без анимации при наведении</option>
+                        <option value="none">Без реакции на наведение</option>
                         <option value="hover-zoom">🔍 Увеличение (Zoom)</option>
                         <option value="hover-tilt">🔄 Наклон вперед</option>
                         <option value="hover-squeeze">🥞 Сплющивание</option>
@@ -365,10 +366,10 @@
     };
 
     let originalImage = new Image();
-    originalImage.crossOrigin = "Anonymous"; // Для загрузки по URL
+    originalImage.crossOrigin = "Anonymous";
     let isImageLoaded = false;
     let isGenerated = false;
-    let inputMode = 'file'; // 'file' или 'url'
+    let inputMode = 'file'; 
     let maxCanvasSize = 600;
 
     // Вкладки загрузки
@@ -393,7 +394,6 @@
         }
     }
 
-    // Загрузка файла
     els.imageUpload.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -404,7 +404,6 @@
         }
     });
 
-    // Загрузка URL
     els.imageUrl.addEventListener('input', debounce(loadImageUrl, 500));
     function loadImageUrl() {
         if(els.imageUrl.value.trim() !== '') processImageSource(els.imageUrl.value.trim());
@@ -419,11 +418,10 @@
             els.placeholder.style.display = 'none';
             triggerUpdate();
         }
-        originalImage.onerror = () => alert('Ошибка загрузки картинки. Возможно, сервер блокирует CORS. Попробуйте скачать её и загрузить как файл.');
+        originalImage.onerror = () => alert('Ошибка загрузки картинки. Возможно, сервер блокирует CORS.');
         originalImage.src = src;
     }
 
-    // Функция Debounce для оптимизации ползунков
     function debounce(func, wait) {
         let timeout;
         return function(...args) {
@@ -447,7 +445,6 @@
         resetProcessButton();
     };
 
-    // Слушатели инпутов
     const inputsToWatch = ['styleSelect', 'toningSelect', 'flipCheck', 'outlineCheck', 'shadowCheck', 'particlesSelect'];
     inputsToWatch.forEach(id => els[id].addEventListener('change', triggerUpdate));
     
@@ -458,17 +455,14 @@
     els.glowColor.addEventListener('input', debounce(triggerUpdate, 100));
     els.animSpeed.addEventListener('input', triggerUpdate);
 
-    // Анимации и эффекты
     const updatePreviewEffects = () => {
         els.canvasWrapper.className = '';
         els.canvas.className = '';
         if (els.animContinuous.value !== 'none') els.canvasWrapper.classList.add(els.animContinuous.value);
         if (els.animHover.value !== 'none') els.canvas.classList.add(els.animHover.value);
 
-        // Тень
         els.previewShadow.style.display = els.shadowCheck.checked ? 'block' : 'none';
 
-        // Имя
         if(els.tooltipInput.value.trim() !== '') {
             els.previewTooltip.textContent = els.tooltipInput.value;
             els.previewTooltip.classList.add('active');
@@ -476,7 +470,6 @@
             els.previewTooltip.classList.remove('active');
         }
 
-        // Обводка через CSS (Самый производительный метод для Canvas)
         let ol = els.outlineCheck.checked;
         let c = els.outlineColor.value;
         let glowV = els.glowSlider.value;
@@ -487,14 +480,11 @@
         if(glowV > 0) dropShadowCSS += `drop-shadow(0 0 ${glowV}px ${glowC}) `;
         
         els.canvas.style.filter = dropShadowCSS.trim();
-
-        // Частицы
         generateParticlesPreview();
     };
 
     [els.animContinuous, els.animHover, els.animClick, els.tooltipInput].forEach(el => el.addEventListener('input', updatePreviewEffects));
 
-    // Частицы для превью
     function generateParticlesPreview() {
         els.particlesPreview.innerHTML = '';
         let type = els.particlesSelect.value;
@@ -515,7 +505,6 @@
         }
     }
 
-    // Клик по канвасу
     els.canvas.addEventListener('click', () => {
         if(els.audioInput.value.trim() !== '') {
             new Audio(els.audioInput.value).play().catch(e=>console.log('Audio error:', e));
@@ -547,7 +536,6 @@
         triggerUpdate();
     });
 
-    // Отрисовка на Canvas (Фильтры)
     function applyStyle() {
         if (!isImageLoaded) return;
 
@@ -563,7 +551,6 @@
 
         if (isFlipped) { tempCtx.translate(els.canvas.width, 0); tempCtx.scale(-1, 1); }
 
-        // Базовые фильтры и Тонирование (через CSS filter на canvas API)
         let filterStr = `brightness(${brightness}%) `;
         
         if (style === 'sketch') filterStr += `grayscale(100%) contrast(200%) `;
@@ -571,7 +558,6 @@
         if (style === 'ghost') filterStr += `invert(80%) grayscale(50%) hue-rotate(180deg) blur(1px) `;
         if (style === 'hologram') filterStr += `sepia(100%) hue-rotate(180deg) saturate(300%) contrast(150%) `;
         
-        // Статусы тонирования
         if (toning === 'poison') filterStr += `sepia(100%) hue-rotate(60deg) saturate(300%) `;
         if (toning === 'fire') filterStr += `sepia(100%) hue-rotate(-30deg) saturate(400%) `;
         if (toning === 'freeze') filterStr += `sepia(100%) hue-rotate(180deg) saturate(200%) brightness(120%) `;
@@ -584,7 +570,6 @@
         tempCtx.globalAlpha = 1.0; 
         tempCtx.filter = 'none';
 
-        // Спецэффекты стиля (Пиксели и линии)
         if (style === 'pixel') {
             let pSize = 2; 
             const w = Math.ceil(els.canvas.width / pSize), h = Math.ceil(els.canvas.height / pSize);
@@ -620,7 +605,6 @@
                 isGenerated = true;
             }, 500);
         } else {
-            // ОПРЕДЕЛЯЕМ ИСТОЧНИК
             let finalImageSrc = '';
             let requiresCanvasEncode = els.styleSelect.value === 'pixel' || els.styleSelect.value === 'silhouette' || els.flipCheck.checked || els.toningSelect.value !== 'none';
             
@@ -637,7 +621,6 @@
             const tooltip = els.tooltipInput.value.replace(/"/g, '&quot;');
             const audioStr = els.audioInput.value;
             
-            // Сборка фильтров для CSS
             let imgCssFilter = '';
             if(inputMode === 'url' && !requiresCanvasEncode) {
                imgCssFilter = `brightness(${els.brightnessSlider.value}%) opacity(${els.opacitySlider.value}%) `;
@@ -650,7 +633,6 @@
             if(ol) imgCssFilter += `drop-shadow(2px 0 0 ${c}) drop-shadow(-2px 0 0 ${c}) drop-shadow(0 2px 0 ${c}) drop-shadow(0 -2px 0 ${c}) `;
             if(glowV > 0) imgCssFilter += `drop-shadow(0 0 ${glowV}px ${glowC}) `;
 
-            // Логика скриптов (Клик + Аудио)
             let scriptBlock = "";
             let clickLogic = "";
             if(clk !== 'none') {
@@ -689,34 +671,27 @@
 
             let tooltipHTML = tooltip ? `<div class="g-tt">${tooltip}</div>` : '';
 
-            // ФИНАЛЬНЫЙ HTML КОД (С pointer-events для Genially)
+            // ФИНАЛЬНЫЙ HTML КОД СО ВСЕМИ АНИМАЦИЯМИ В CSS
             const geniallyCode = `<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <style>
-  /* POINTER-EVENTS: NONE; позволяет кликать СКВОЗЬ пустые места фрейма в Genially */
   html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; font-family: sans-serif; pointer-events: none;}
-  
   .g-cont { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; position: relative; --anim-speed: ${speed}s; }
-  
-  /* Делаем кликабельным только саму картинку-обертку */
   .g-wrap { position: relative; display: inline-flex; justify-content: center; align-items: center; width: 100%; height: 100%; pointer-events: auto; }
   
   #g-img { width: 100%; height: 100%; object-fit: contain; cursor: pointer; transition: 0.3s ease; display: block; position: relative; z-index: 5; filter: ${imgCssFilter || 'none'}; }
   
-  /* Тень на полу */
   .g-shadow { position: absolute; bottom: 5%; width: 50%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, transparent 70%); border-radius: 50%; z-index: 1; pointer-events: none; }
   
-  /* Тултип */
   .g-tt { position: absolute; top: 10%; background: rgba(0,0,0,0.8); border: 1px solid ${glowC}; color: ${glowC}; padding: 5px 15px; border-radius: 5px; font-size: 14px; font-weight: bold; opacity: 0; transition: 0.3s; z-index: 10; pointer-events: none; transform: translateY(10px); text-align: center;}
   #g-img:hover ~ .g-tt { opacity: 1; transform: translateY(0); }
   
-  /* Частицы */
   .p-wrap { position: absolute; width: 100%; height: 100%; top:0; left:0; z-index: 2; pointer-events: none; overflow: hidden; }
   @keyframes p-anim { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(-50px) scale(1.5); opacity: 0; } }
 
-  /* Анимации */
+  /* --- ВСЕ КЛАССЫ АНИМАЦИЙ --- */
   .anim-float { animation: float var(--anim-speed) ease-in-out infinite; }
   .anim-pulse { animation: pulse calc(var(--anim-speed) / 1.5) infinite; }
   .anim-breathe { animation: breathe var(--anim-speed) ease-in-out infinite; }
@@ -735,6 +710,7 @@
   .hover-neon:hover { animation: neon calc(var(--anim-speed) / 2) alternate infinite; }
   .hover-shake:hover { animation: shake 0.3s infinite; }
 
+  /* --- ВСЕ КЛЮЧЕВЫЕ КАДРЫ --- */
   @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
   @keyframes pulse { 0%, 100% { transform: scale(1); filter: brightness(100%);} 50% { transform: scale(1.08); filter: brightness(130%); } }
   @keyframes breathe { 0%, 100% { transform: scaleY(1) scaleX(1); } 50% { transform: scaleY(1.05) scaleX(0.98); } }
@@ -743,11 +719,12 @@
   @keyframes spin { 100% { transform: rotate(360deg); } }
   @keyframes neon { 0% { filter: brightness(100%) drop-shadow(0 0 5px ${glowC}); } 100% { filter: brightness(150%) drop-shadow(0 0 20px ${glowC}); } }
   @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
-  @keyframes ghost { 0% { opacity: 1; filter: grayscale(0%);} 100% { opacity: 0.3; filter: grayscale(80%) blur(2px);} }
   @keyframes squish { 0%, 100% { transform: scale(1); } 50% { transform: scaleY(0.4) scaleX(1.5) translateY(30%); } }
   @keyframes vanish { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(2); } }
   @keyframes flip { 0% { transform: perspective(400px) rotateY(0deg); } 100% { transform: perspective(400px) rotateY(360deg); } }
   @keyframes glitch { 0% { transform: translate(0) } 20% { transform: translate(-3px, 3px) } 40% { transform: translate(-3px, -3px) } 60% { transform: translate(3px, 3px) } 80% { transform: translate(3px, -3px) } 100% { transform: translate(0) } }
+  @keyframes swing { 20% { transform: rotate(15deg); } 40% { transform: rotate(-10deg); } 60% { transform: rotate(5deg); } 80% { transform: rotate(-5deg); } 100% { transform: rotate(0deg); } }
+  @keyframes ghost { 0% { opacity: 1; filter: grayscale(0%);} 100% { opacity: 0.3; filter: grayscale(80%) blur(2px);} }
 </style>
 </head>
 <body>
