@@ -481,7 +481,7 @@
             const speed = animSpeed.value;
             const glowC = glowColor.value;
             
-            let clickScript = "";
+            let scriptBlock = "";
             if(clk !== 'none') {
                 let animName = clk.replace('click-', '');
                 let t = "0.5s ease forwards";
@@ -491,11 +491,27 @@
                 if(animName === 'flip') t = "0.6s forwards";
                 if(animName === 'glitch') t = "0.3s linear infinite";
 
-                clickScript = `onclick="this.style.animation='none'; void this.offsetWidth; this.style.animation='${animName} ${t}'; setTimeout(()=>{this.style.animation=''}, 1000);"`;
+                scriptBlock = `
+<script>
+  const img = document.getElementById('gen-img');
+  if(img) {
+      img.addEventListener('click', function() {
+          this.style.animation = 'none';
+          void this.offsetWidth;
+          this.style.animation = '${animName} ${t}';
+          setTimeout(() => { this.style.animation = ''; }, 1000);
+      });
+  }
+<\/script>`;
             }
 
-            const geniallyCode = `
+            // ТЕПЕРЬ ЭТО ПОЛНОЦЕННЫЙ HTML ДОКУМЕНТ ДЛЯ IFRAME GENIALLY
+            const geniallyCode = `<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
 <style>
+  body { margin: 0; padding: 0; overflow: hidden; background: transparent; display: flex; justify-content: center; align-items: center; height: 100vh; }
   .g-wrap { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; --anim-speed: ${speed}s; }
   .g-img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: pointer; transition: 0.3s ease; }
   
@@ -535,11 +551,14 @@
   @keyframes vanish { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(2); } }
   @keyframes flip { 0% { transform: perspective(400px) rotateY(0deg); } 100% { transform: perspective(400px) rotateY(360deg); } }
 </style>
-
+</head>
+<body>
 <div class="g-wrap ${cont !== 'none' ? cont : ''}">
-  <img src="${base64Image}" class="g-img ${hov !== 'none' ? hov : ''}" ${clickScript}>
+  <img id="gen-img" src="${base64Image}" class="g-img ${hov !== 'none' ? hov : ''}">
 </div>
-`;
+${scriptBlock}
+</body>
+</html>`;
             
             navigator.clipboard.writeText(geniallyCode).then(() => {
                 processBtn.textContent = '✅ Скопировано!';
