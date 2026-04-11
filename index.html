@@ -104,6 +104,7 @@
             font-weight: 600;
             text-align: center;
             display: block;
+            margin-bottom: 20px; /* ДОБАВЛЕН ОТСТУП СНИЗУ */
         }
 
         .custom-file-upload:hover { background-color: rgba(223, 178, 62, 0.1); }
@@ -142,9 +143,6 @@
         }
         button:hover { background-color: var(--gold-hover); transform: translateY(-2px); }
         button:disabled { background-color: #444; color: #777; cursor: not-allowed; transform: none; }
-
-        .btn-outline { background-color: transparent; color: var(--gold); border: 2px solid var(--gold); display: none; }
-        .btn-outline:hover { background-color: var(--gold); color: #000; }
 
         /* ПРЕВЬЮ И АНИМАЦИИ */
         .preview-box {
@@ -320,8 +318,6 @@
 
         <div class="buttons-group">
             <button id="processBtn" disabled>Сгенерировать картинку</button>
-            <button id="downloadBtn" class="btn-outline">Скачать (Оригинал)</button>
-            <button id="geniallyBtn" class="btn-outline">Скопировать код для Genially 🧬</button>
         </div>
     </div>
 
@@ -347,8 +343,6 @@
     
     // Элементы управления
     const processBtn = document.getElementById('processBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const geniallyBtn = document.getElementById('geniallyBtn');
     const placeholder = document.getElementById('placeholder');
     
     const brightnessSlider = document.getElementById('brightnessSlider');
@@ -368,6 +362,7 @@
 
     let originalImage = new Image();
     let isImageLoaded = false;
+    let isGenerated = false; // Отслеживаем состояние генерации
     
     // МАКСИМАЛЬНЫЙ размер для веба/Genially, чтобы код был легким
     let maxCanvasSize = 600; 
@@ -460,139 +455,46 @@
     function resetButtons() {
         processBtn.textContent = 'Сгенерировать картинку';
         processBtn.disabled = false;
-        downloadBtn.style.display = 'none';
-        geniallyBtn.style.display = 'none';
+        processBtn.style.backgroundColor = 'var(--gold)';
+        processBtn.style.color = '#000';
+        isGenerated = false;
     }
 
     processBtn.addEventListener('click', function() {
         if (!isImageLoaded) return;
-        processBtn.textContent = 'Обработка пикселей... ⚡';
-        processBtn.disabled = true;
-        setTimeout(() => {
-            processBtn.textContent = '✨ Готово!';
-            downloadBtn.style.display = 'block';
-            geniallyBtn.style.display = 'block';
-        }, 600);
-    });
-
-    // МАТЕМАТИКА ОТРИСОВКИ
-    function applyStyle() {
-        if (!isImageLoaded) return;
-
-        const style = styleSelect.value;
-        const brightness = brightnessSlider.value;
-        const opacity = opacitySlider.value / 100;
-        const glowV = glowSlider.value;
-        const glowC = glowColor.value;
-        const isFlipped = flipCheck.checked;
-
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
-        const tempCtx = tempCanvas.getContext('2d');
-
-        if (isFlipped) {
-            tempCtx.translate(canvas.width, 0);
-            tempCtx.scale(-1, 1);
-        }
-
-        let filterStr = `brightness(${brightness}%)`;
         
-        if (style === 'sketch') filterStr += ` grayscale(100%) contrast(200%)`;
-        if (style === 'cyberpunk') filterStr += ` saturate(300%) hue-rotate(90deg) contrast(150%) invert(10%)`;
-        if (style === 'ghost') filterStr += ` invert(80%) grayscale(50%) hue-rotate(180deg) blur(1px)`;
-        if (style === 'hologram') filterStr += ` sepia(100%) hue-rotate(180deg) saturate(300%) contrast(150%)`;
-        if (style === 'thermal') filterStr += ` invert(100%) hue-rotate(180deg) saturate(500%) contrast(200%)`;
-        if (style === 'acid') filterStr += ` saturate(500%) hue-rotate(270deg) contrast(200%) invert(20%)`;
-        if (style === 'gold') filterStr += ` sepia(100%) contrast(150%) saturate(200%) hue-rotate(15deg) drop-shadow(2px 4px 6px black)`;
-        if (style === 'ice') filterStr += ` sepia(100%) hue-rotate(180deg) saturate(100%) contrast(120%) brightness(150%)`;
-        if (style === 'crt') filterStr += ` saturate(200%) contrast(150%) blur(0.5px)`;
-
-        tempCtx.filter = filterStr;
-        tempCtx.globalAlpha = opacity;
-        tempCtx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
-        tempCtx.globalAlpha = 1.0; 
-        tempCtx.filter = 'none';
-
-        if (style === 'pixel') {
-            let pSize = 4;
-            const w = Math.ceil(canvas.width / pSize);
-            const h = Math.ceil(canvas.height / pSize);
-            const tinyC = document.createElement('canvas');
-            tinyC.width = w; tinyC.height = h;
-            tinyC.getContext('2d').drawImage(tempCanvas, 0, 0, w, h);
+        if (!isGenerated) {
+            // ЭТАП 1: ГЕНЕРАЦИЯ
+            processBtn.textContent = 'Обработка пикселей... ⚡';
+            processBtn.disabled = true;
+            setTimeout(() => {
+                processBtn.textContent = 'Скопировать';
+                processBtn.disabled = false;
+                isGenerated = true;
+            }, 600);
+        } else {
+            // ЭТАП 2: КОПИРОВАНИЕ ДЛЯ GENIALLY
+            const base64Image = canvas.toDataURL('image/webp', 0.7);
+            const cont = animContinuous.value;
+            const hov = animHover.value;
+            const clk = animClick.value;
+            const speed = animSpeed.value;
+            const glowC = glowColor.value;
             
-            tempCtx.clearRect(0, 0, canvas.width, canvas.height);
-            tempCtx.imageSmoothingEnabled = false;
-            tempCtx.drawImage(tinyC, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
-        } 
-        else if (style === 'silhouette') {
-            tempCtx.globalCompositeOperation = 'source-in';
-            tempCtx.fillStyle = '#050505';
-            tempCtx.fillRect(0, 0, canvas.width, canvas.height);
-            tempCtx.globalCompositeOperation = 'source-over';
-        } 
-        else if (style === 'hologram' || style === 'crt') {
-            tempCtx.globalCompositeOperation = 'source-atop';
-            tempCtx.fillStyle = style === 'hologram' ? 'rgba(0, 255, 255, 0.15)' : 'rgba(0,0,0,0.3)';
-            let step = style === 'hologram' ? 4 : 3;
-            for(let y = 0; y < canvas.height; y += step) {
-                tempCtx.fillRect(0, y, canvas.width, 1.5);
+            let clickScript = "";
+            if(clk !== 'none') {
+                let animName = clk.replace('click-', '');
+                let t = "0.5s ease forwards";
+                if(animName === 'spin') t = "0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards";
+                if(animName === 'squish') t = "0.3s forwards";
+                if(animName === 'vanish') t = "0.5s forwards";
+                if(animName === 'flip') t = "0.6s forwards";
+                if(animName === 'glitch') t = "0.3s linear infinite";
+
+                clickScript = `onclick="this.style.animation='none'; void this.offsetWidth; this.style.animation='${animName} ${t}'; setTimeout(()=>{this.style.animation=''}, 1000);"`;
             }
-            if (style === 'crt') {
-                tempCtx.globalCompositeOperation = 'screen';
-                tempCtx.fillStyle = 'rgba(255,0,0,0.1)';
-                tempCtx.fillRect(2, 0, canvas.width, canvas.height);
-                tempCtx.fillStyle = 'rgba(0,0,255,0.1)';
-                tempCtx.fillRect(-2, 0, canvas.width, canvas.height);
-            }
-            tempCtx.globalCompositeOperation = 'source-over';
-        }
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.shadowColor = glowV > 0 ? glowC : 'transparent';
-        ctx.shadowBlur = parseInt(glowV);
-        ctx.imageSmoothingEnabled = true;
-
-        ctx.setTransform(1, 0, 0, 1, 0, 0); 
-        ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
-    }
-
-    // СКАЧАТЬ КАРТИНКУ
-    downloadBtn.addEventListener('click', function() {
-        const link = document.createElement('a');
-        link.download = 'magic_character.webp'; 
-        link.href = canvas.toDataURL('image/webp', 0.9);
-        link.click();
-    });
-
-    // ГЕНЕРАТОР КОДА ДЛЯ GENIALLY
-    geniallyBtn.addEventListener('click', function() {
-        // Ужимаем до качества 0.7, чтобы код не был слишком длинным (Genially имеет лимиты)
-        const base64Image = canvas.toDataURL('image/webp', 0.7);
-        
-        const cont = animContinuous.value;
-        const hov = animHover.value;
-        const clk = animClick.value;
-        const speed = animSpeed.value;
-        
-        // Магия JS для клика в Genially (если выбрана анимация)
-        let clickScript = "";
-        if(clk !== 'none') {
-            let animName = clk.replace('click-', '');
-            // Особые настройки времени для разных клик-анимаций
-            let t = "0.5s ease forwards";
-            if(animName === 'spin') t = "0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards";
-            if(animName === 'squish') t = "0.3s forwards";
-            if(animName === 'vanish') t = "0.5s forwards";
-            if(animName === 'flip') t = "0.6s forwards";
-            if(animName === 'glitch') t = "0.3s linear infinite";
-
-            clickScript = `onclick="this.style.animation='none'; void this.offsetWidth; this.style.animation='${animName} ${t}'; setTimeout(()=>{this.style.animation=''}, 1000);"`;
-        }
-
-        // Формируем полностью автономный кусок HTML для вставки
-        const geniallyCode = `
+            const geniallyCode = `
 <style>
   .g-wrap { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; --anim-speed: ${speed}s; }
   .g-img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: pointer; transition: 0.3s ease; }
@@ -638,22 +540,106 @@
   <img src="${base64Image}" class="g-img ${hov !== 'none' ? hov : ''}" ${clickScript}>
 </div>
 `;
-        
-        // Копируем в буфер обмена
-        navigator.clipboard.writeText(geniallyCode).then(() => {
-            const oldText = geniallyBtn.textContent;
-            geniallyBtn.textContent = '✅ Код скопирован! Вставьте в Genially';
-            geniallyBtn.style.backgroundColor = 'var(--gold)';
-            geniallyBtn.style.color = '#000';
-            setTimeout(() => {
-                geniallyBtn.textContent = oldText;
-                geniallyBtn.style.backgroundColor = 'transparent';
-                geniallyBtn.style.color = 'var(--gold)';
-            }, 3000);
-        }).catch(err => {
-            alert('Ошибка копирования. Ваш браузер блокирует буфер обмена.');
-        });
+            
+            navigator.clipboard.writeText(geniallyCode).then(() => {
+                processBtn.textContent = '✅ Скопировано!';
+                processBtn.style.backgroundColor = '#4CAF50'; // Зеленый цвет
+                processBtn.style.color = '#fff';
+                setTimeout(() => {
+                    processBtn.textContent = 'Скопировать';
+                    processBtn.style.backgroundColor = 'var(--gold)';
+                    processBtn.style.color = '#000';
+                }, 3000);
+            }).catch(err => {
+                alert('Ошибка копирования. Ваш браузер блокирует буфер обмена.');
+            });
+        }
     });
+
+    // МАТЕМАТИКА ОТРИСОВКИ
+    function applyStyle() {
+        if (!isImageLoaded) return;
+
+        const style = styleSelect.value;
+        const brightness = brightnessSlider.value;
+        const opacity = opacitySlider.value / 100;
+        const glowV = glowSlider.value;
+        const glowC = glowColor.value;
+        const isFlipped = flipCheck.checked;
+
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+
+        if (isFlipped) {
+            tempCtx.translate(canvas.width, 0);
+            tempCtx.scale(-1, 1);
+        }
+
+        let filterStr = `brightness(${brightness}%)`;
+        
+        if (style === 'sketch') filterStr += ` grayscale(100%) contrast(200%)`;
+        if (style === 'cyberpunk') filterStr += ` saturate(300%) hue-rotate(90deg) contrast(150%) invert(10%)`;
+        if (style === 'ghost') filterStr += ` invert(80%) grayscale(50%) hue-rotate(180deg) blur(1px)`;
+        if (style === 'hologram') filterStr += ` sepia(100%) hue-rotate(180deg) saturate(300%) contrast(150%)`;
+        if (style === 'thermal') filterStr += ` invert(100%) hue-rotate(180deg) saturate(500%) contrast(200%)`;
+        if (style === 'acid') filterStr += ` saturate(500%) hue-rotate(270deg) contrast(200%) invert(20%)`;
+        if (style === 'gold') filterStr += ` sepia(100%) contrast(150%) saturate(200%) hue-rotate(15deg) drop-shadow(2px 4px 6px black)`;
+        if (style === 'ice') filterStr += ` sepia(100%) hue-rotate(180deg) saturate(100%) contrast(120%) brightness(150%)`;
+        if (style === 'crt') filterStr += ` saturate(200%) contrast(150%) blur(0.5px)`;
+
+        tempCtx.filter = filterStr;
+        tempCtx.globalAlpha = opacity;
+        tempCtx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+        tempCtx.globalAlpha = 1.0; 
+        tempCtx.filter = 'none';
+
+        if (style === 'pixel') {
+            let pSize = 2; // Уменьшен размер пикселя, чтобы не съедались лица
+            const w = Math.ceil(canvas.width / pSize);
+            const h = Math.ceil(canvas.height / pSize);
+            const tinyC = document.createElement('canvas');
+            tinyC.width = w; tinyC.height = h;
+            const tCtx = tinyC.getContext('2d');
+            tCtx.filter = 'contrast(115%) saturate(110%)'; // Легкий контраст для выделения черт
+            tCtx.drawImage(tempCanvas, 0, 0, w, h);
+            
+            tempCtx.clearRect(0, 0, canvas.width, canvas.height);
+            tempCtx.imageSmoothingEnabled = false;
+            tempCtx.drawImage(tinyC, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
+        } 
+        else if (style === 'silhouette') {
+            tempCtx.globalCompositeOperation = 'source-in';
+            tempCtx.fillStyle = '#050505';
+            tempCtx.fillRect(0, 0, canvas.width, canvas.height);
+            tempCtx.globalCompositeOperation = 'source-over';
+        } 
+        else if (style === 'hologram' || style === 'crt') {
+            tempCtx.globalCompositeOperation = 'source-atop';
+            tempCtx.fillStyle = style === 'hologram' ? 'rgba(0, 255, 255, 0.15)' : 'rgba(0,0,0,0.3)';
+            let step = style === 'hologram' ? 4 : 3;
+            for(let y = 0; y < canvas.height; y += step) {
+                tempCtx.fillRect(0, y, canvas.width, 1.5);
+            }
+            if (style === 'crt') {
+                tempCtx.globalCompositeOperation = 'screen';
+                tempCtx.fillStyle = 'rgba(255,0,0,0.1)';
+                tempCtx.fillRect(2, 0, canvas.width, canvas.height);
+                tempCtx.fillStyle = 'rgba(0,0,255,0.1)';
+                tempCtx.fillRect(-2, 0, canvas.width, canvas.height);
+            }
+            tempCtx.globalCompositeOperation = 'source-over';
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.shadowColor = glowV > 0 ? glowC : 'transparent';
+        ctx.shadowBlur = parseInt(glowV);
+        ctx.imageSmoothingEnabled = true;
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0); 
+        ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+    }
 </script>
 
 </body>
