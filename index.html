@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Продвинутый редактор персонажа</title>
+    <title>Продвинутый редактор персонажа (PRO)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -14,154 +14,114 @@
             --text-light: #e0e0e0;
             --font-heading: 'Cormorant Garamond', serif;
             --font-main: 'Montserrat', sans-serif;
-            --anim-speed: 2s; /* Базовая скорость анимации */
+            --anim-speed: 2s;
         }
 
         body {
             background-color: var(--bg-dark);
             color: var(--text-light);
             font-family: var(--font-main);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
             background-image: radial-gradient(circle at 50% 0%, #302a1c 0%, var(--bg-dark) 70%);
         }
 
         .editor-container {
             background-color: var(--bg-panel);
-            padding: 25px;
-            border-radius: 15px;
+            padding: 25px; border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.9), 0 0 20px rgba(223, 178, 62, 0.15);
-            width: 95%;
-            max-width: 1300px;
-            height: 92vh;
-            display: flex;
-            gap: 25px;
-            box-sizing: border-box;
+            width: 98%; max-width: 1400px; height: 95vh;
+            display: flex; gap: 20px; box-sizing: border-box;
         }
 
         /* ЛЕВАЯ ПАНЕЛЬ */
         .left-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            padding-right: 15px;
-            gap: 15px;
+            flex: 1.2; display: flex; flex-direction: column;
+            overflow-y: auto; padding-right: 15px; gap: 15px;
         }
-
         .left-panel::-webkit-scrollbar { width: 6px; }
         .left-panel::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 10px; }
         .left-panel::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
         /* ПРАВАЯ ПАНЕЛЬ */
         .right-panel {
-            flex: 1.3;
-            display: flex;
-            flex-direction: column;
+            flex: 1; display: flex; flex-direction: column; position: relative;
         }
 
-        h1 {
-            font-family: var(--font-heading);
-            color: var(--gold);
-            font-size: 2em;
-            margin: 0 0 5px 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
+        h1 { font-family: var(--font-heading); color: var(--gold); font-size: 1.8em; margin: 0 0 5px 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
         p.subtitle { font-size: 0.8em; color: #a0a0a0; margin: 0 0 15px 0; }
 
         fieldset {
-            border: 1px solid #444;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            background: rgba(0,0,0,0.2);
+            border: 1px solid #44; border-radius: 8px; padding: 12px; margin-bottom: 8px; background: rgba(0,0,0,0.2);
         }
+        legend { color: var(--gold); font-weight: 600; font-size: 0.9em; padding: 0 10px; }
+        .controls { display: flex; flex-direction: column; gap: 10px; }
 
-        legend {
-            color: var(--gold);
-            font-weight: 600;
-            font-size: 0.9em;
-            padding: 0 10px;
-        }
-
-        .controls { display: flex; flex-direction: column; gap: 12px; }
-
+        /* Табы загрузки */
+        .upload-tabs { display: flex; gap: 10px; margin-bottom: 10px; }
+        .tab-btn { flex: 1; background: #2a2a2a; color: #888; border: 1px solid #444; padding: 8px; border-radius: 5px; cursor: pointer; font-size: 0.8em; transition: 0.3s; }
+        .tab-btn.active { background: var(--gold); color: #000; border-color: var(--gold); font-weight: bold; }
+        
+        .upload-section { display: none; }
+        .upload-section.active { display: block; }
+        
         input[type="file"] { display: none; }
-
-        .custom-file-upload {
-            border: 2px dashed var(--gold);
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            color: var(--gold);
-            font-weight: 600;
-            text-align: center;
-            display: block;
-            margin-bottom: 20px;
-        }
-
+        .custom-file-upload { border: 2px dashed var(--gold); padding: 10px; border-radius: 8px; cursor: pointer; transition: 0.3s; color: var(--gold); font-weight: 600; text-align: center; display: block; font-size: 0.9em; }
         .custom-file-upload:hover { background-color: rgba(223, 178, 62, 0.1); }
+        
+        .text-input { width: 100%; padding: 10px; background-color: #111; color: #fff; border: 1px solid #555; border-radius: 8px; font-family: var(--font-main); font-size: 0.85em; outline: none; box-sizing: border-box; }
+        .text-input:focus { border-color: var(--gold); }
 
-        select {
-            width: 100%;
-            padding: 10px;
-            background-color: #111;
-            color: var(--text-light);
-            border: 1px solid #555;
-            border-radius: 8px;
-            font-family: var(--font-main);
-            font-size: 0.85em;
-            outline: none;
-            cursor: pointer;
-        }
-
-        .slider-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px;}
+        select { width: 100%; padding: 8px; background-color: #111; color: var(--text-light); border: 1px solid #555; border-radius: 8px; font-family: var(--font-main); font-size: 0.85em; outline: none; cursor: pointer; }
+        .slider-group { display: flex; flex-direction: column; gap: 4px; }
         .slider-group label { font-size: 0.8em; color: #ccc; display: flex; justify-content: space-between; }
-
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: var(--gold); cursor: pointer; margin-top: -5px; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: #555; border-radius: 2px; }
 
-        .color-picker-group { display: flex; justify-content: space-between; align-items: center; font-size: 0.85em; }
-        input[type="color"] { border: none; width: 40px; height: 30px; border-radius: 5px; cursor: pointer; background: none; }
+        .color-group { display: flex; align-items: center; justify-content: space-between; font-size: 0.85em; color: #ccc;}
+        input[type="color"] { border: none; width: 35px; height: 25px; border-radius: 5px; cursor: pointer; background: none; }
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border: 1px solid #666; border-radius: 5px; }
+        .checkbox-group { display: flex; align-items: center; gap: 8px; font-size: 0.85em; cursor: pointer; color: #ccc;}
 
-        .checkbox-group { display: flex; align-items: center; gap: 10px; font-size: 0.85em; cursor: pointer; color: #ccc;}
+        .buttons-group { display: flex; gap: 10px; margin-top: auto; padding-top: 10px;}
+        .buttons-group button { flex: 1; padding: 12px; border-radius: 8px; font-family: var(--font-main); font-weight: 600; cursor: pointer; transition: 0.3s; border: none; }
+        #processBtn { background-color: var(--gold); color: #000; }
+        #processBtn:hover { background-color: var(--gold-hover); transform: translateY(-2px); }
+        #processBtn:disabled { background-color: #444; color: #777; cursor: not-allowed; transform: none; }
+        #resetBtn { background-color: transparent; border: 1px solid #666; color: #ccc; flex: 0.4; }
+        #resetBtn:hover { background-color: #333; color: #fff; }
 
-        .buttons-group { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
-        button {
-            background-color: var(--gold); color: #000; border: none; padding: 12px; border-radius: 8px;
-            font-family: var(--font-main); font-weight: 600; cursor: pointer; transition: 0.3s;
-        }
-        button:hover { background-color: var(--gold-hover); transform: translateY(-2px); }
-        button:disabled { background-color: #444; color: #777; cursor: not-allowed; transform: none; }
-
-        /* ПРЕВЬЮ И АНИМАЦИИ */
+        /* ПРЕВЬЮ */
         .preview-box {
-            width: 100%; height: 100%; background-color: #000; border-radius: 10px; display: flex;
-            justify-content: center; align-items: center; overflow: hidden; position: relative;
+            flex: 1; border-radius: 10px; display: flex; justify-content: center; align-items: center;
+            overflow: hidden; position: relative; border: 1px solid #333; transition: background 0.3s;
+            background-color: #000;
             background-image: linear-gradient(45deg, #111 25%, transparent 25%), linear-gradient(-45deg, #111 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #111 75%), linear-gradient(-45deg, transparent 75%, #111 75%);
             background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-            border: 1px solid #333;
         }
 
-        #canvasWrapper {
-            display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; transition: all 0.3s ease;
-        }
+        .bg-toggles { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+        .bg-toggles button { background: #222; border: 1px solid #444; color: #fff; border-radius: 5px; padding: 5px 10px; cursor: pointer; font-size: 1.2em; }
+        .bg-toggles button:hover { border-color: var(--gold); }
 
-        canvas { max-width: 90%; max-height: 90%; object-fit: contain; transition: all 0.3s ease; cursor: pointer;}
+        #canvasWrapper { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; transition: all 0.3s ease; }
+        canvas { max-width: 90%; max-height: 80%; object-fit: contain; transition: all 0.3s ease; cursor: pointer; position: relative; z-index: 5;}
+        .placeholder-text { position: absolute; color: #666; background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 10px; font-size: 0.9em; z-index: 10;}
 
-        .placeholder-text { position: absolute; color: #666; background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 10px; font-size: 0.9em;}
+        /* ДОП ЭФФЕКТЫ ПРЕВЬЮ */
+        .preview-shadow { position: absolute; bottom: 5%; width: 50%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; display: none; z-index: 1;}
+        .preview-tooltip { position: absolute; top: 10%; background: rgba(0,0,0,0.8); border: 1px solid var(--gold); color: var(--gold); padding: 5px 15px; border-radius: 5px; font-size: 0.9em; font-weight: bold; pointer-events: none; opacity: 0; transition: 0.3s; z-index: 10; transform: translateY(10px);}
+        canvas:hover ~ .preview-tooltip.active { opacity: 1; transform: translateY(0); }
+        
+        /* ЧАСТИЦЫ */
+        .particles-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; overflow: hidden; display: none;}
+        .particle { position: absolute; border-radius: 50%; animation: floatUp linear infinite; opacity: 0; }
+        @keyframes floatUp { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }
 
-        /* ПОСТОЯННЫЕ АНИМАЦИИ */
+        /* АНИМАЦИИ (как раньше) */
         .anim-float { animation: float var(--anim-speed) ease-in-out infinite; }
         .anim-pulse { animation: pulse calc(var(--anim-speed) / 1.5) infinite; }
         .anim-breathe { animation: breathe var(--anim-speed) ease-in-out infinite; }
@@ -173,7 +133,6 @@
         .anim-shake { animation: shake calc(var(--anim-speed) / 4) infinite; }
         .anim-ghost { animation: ghost var(--anim-speed) infinite alternate; }
 
-        /* АНИМАЦИИ ПРИ НАВЕДЕНИИ */
         .hover-zoom:hover { transform: scale(1.15) !important; }
         .hover-blur:hover { filter: blur(5px); }
         .hover-tilt:hover { transform: rotate(15deg) scale(1.05) !important; }
@@ -181,7 +140,6 @@
         .hover-neon:hover { animation: neon calc(var(--anim-speed) / 2) alternate infinite; }
         .hover-shake:hover { animation: shake 0.3s infinite; }
 
-        /* АНИМАЦИИ ПО КЛИКУ (применяются через класс в JS) */
         .click-bounce-trigger { animation: bounce 0.5s ease forwards !important; }
         .click-spin-trigger { animation: spin 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards !important; }
         .click-squish-trigger { animation: squish 0.3s forwards !important; }
@@ -189,7 +147,6 @@
         .click-flip-trigger { animation: flip 0.6s forwards !important; }
         .click-glitch-trigger { animation: glitch 0.3s linear infinite !important; }
 
-        /* KEYFRAMES */
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); filter: brightness(130%); } 100% { transform: scale(1); } }
         @keyframes breathe { 0%, 100% { transform: scaleY(1) scaleX(1); } 50% { transform: scaleY(1.05) scaleX(0.98); } }
@@ -201,29 +158,38 @@
         @keyframes swing { 20% { transform: rotate(15deg); } 40% { transform: rotate(-10deg); } 60% { transform: rotate(5deg); } 80% { transform: rotate(-5deg); } 100% { transform: rotate(0deg); } }
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
         @keyframes ghost { 0% { opacity: 1; filter: grayscale(0%);} 100% { opacity: 0.3; filter: grayscale(80%) blur(2px);} }
-        @keyframes squish { 0% { transform: scale(1); } 50% { transform: scaleY(0.4) scaleX(1.5) translateY(30%); } 100% { transform: scale(1); } }
+        @keyframes squish { 0%, 100% { transform: scale(1); } 50% { transform: scaleY(0.4) scaleX(1.5) translateY(30%); } }
         @keyframes vanish { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(2); } }
         @keyframes flip { 0% { transform: perspective(400px) rotateY(0deg); } 100% { transform: perspective(400px) rotateY(360deg); } }
-
     </style>
 </head>
 <body>
 
 <div class="editor-container">
-    <!-- ЛЕВАЯ КОЛОНКА -->
     <div class="left-panel">
         <div>
-            <h1>Редактор персонажа</h1>
-            <p class="subtitle">Настрой стиль, цвет и выбери эффекты анимации</p>
+            <h1>Редактор персонажа PRO</h1>
+            <p class="subtitle">Настрой визуал, эффекты и интерактивы для игры</p>
 
-            <label class="custom-file-upload">
-                <input type="file" id="imageUpload" accept="image/png, image/jpeg, image/webp">
-                <span id="fileName">📁 Загрузить картинку (без фона)</span>
-            </label>
+            <!-- БЛОК: ЗАГРУЗКА -->
+            <div class="upload-tabs">
+                <button class="tab-btn active" onclick="switchTab('file')">📁 Файл с ПК</button>
+                <button class="tab-btn" onclick="switchTab('url')">🔗 Ссылка (URL)</button>
+            </div>
+            
+            <div id="tab-file" class="upload-section active">
+                <label class="custom-file-upload">
+                    <input type="file" id="imageUpload" accept="image/png, image/jpeg, image/webp">
+                    <span id="fileName">Нажми, чтобы загрузить картинку без фона</span>
+                </label>
+            </div>
+            <div id="tab-url" class="upload-section">
+                <input type="text" id="imageUrl" class="text-input" placeholder="Вставь прямую ссылку на картинку (https://...)" style="margin-bottom:15px;">
+            </div>
 
             <!-- БЛОК: ВНЕШНИЙ ВИД -->
             <fieldset>
-                <legend>Внешний вид и фильтры</legend>
+                <legend>Внешний вид и Статусы</legend>
                 <div class="controls">
                     <select id="styleSelect">
                         <option value="none">Оригинал (Без стиля)</option>
@@ -233,16 +199,18 @@
                         <option value="hologram">💿 Голограмма</option>
                         <option value="silhouette">🥷 Силуэт ниндзя</option>
                         <option value="ghost">👻 Призрак</option>
-                        <option value="thermal">🌡️ Тепловизор (Хищник)</option>
-                        <option value="acid">🍄 Кислотный трип</option>
-                        <option value="gold">🏆 Золотая статуя</option>
-                        <option value="ice">❄️ Ледяной кристалл</option>
-                        <option value="crt">📺 Ретро CRT-монитор</option>
                     </select>
 
-                    <label class="checkbox-group">
-                        <input type="checkbox" id="flipCheck"> Отразить по горизонтали (поворот)
-                    </label>
+                    <select id="toningSelect">
+                        <option value="none">🎨 Без цветового статуса</option>
+                        <option value="poison">🤢 Отравлен (Зеленый)</option>
+                        <option value="fire">🔥 В огне (Оранжевый)</option>
+                        <option value="freeze">❄️ Заморожен (Синий)</option>
+                        <option value="rage">💢 Ярость (Красный)</option>
+                        <option value="stone">🪨 Окаменение (Серый)</option>
+                    </select>
+
+                    <label class="checkbox-group"><input type="checkbox" id="flipCheck"> 🔄 Отразить по горизонтали</label>
 
                     <div class="slider-group">
                         <label>Прозрачность <span id="opacityVal">100%</span></label>
@@ -255,50 +223,60 @@
                 </div>
             </fieldset>
 
-            <!-- БЛОК: СВЕЧЕНИЕ -->
+            <!-- БЛОК: ЭФФЕКТЫ -->
             <fieldset>
-                <legend>Магическое свечение</legend>
+                <legend>Эффекты и Окружение</legend>
                 <div class="controls">
                     <div class="slider-group">
-                        <label>Интенсивность <span id="glowVal">0</span></label>
+                        <label>Магическое свечение <span id="glowVal">0</span></label>
                         <input type="range" id="glowSlider" min="0" max="80" value="0">
                     </div>
-                    <div class="color-picker-group">
-                        <label for="glowColor">Цвет (кликни для пипетки):</label>
-                        <input type="color" id="glowColor" value="#dfb23e" title="Выберите цвет или используйте пипетку">
+                    
+                    <div class="color-group" style="margin-bottom: 5px;">
+                        <label class="checkbox-group"><input type="checkbox" id="outlineCheck"> Обводка контура (Stroke)</label>
+                        <input type="color" id="outlineColor" value="#ffffff">
                     </div>
+
+                    <div class="color-group">
+                        <label>Цвет эффектов (Свечение/Частицы):</label>
+                        <input type="color" id="glowColor" value="#dfb23e">
+                    </div>
+
+                    <label class="checkbox-group"><input type="checkbox" id="shadowCheck"> 🕳️ Тень на полу (Приземление)</label>
+
+                    <select id="particlesSelect">
+                        <option value="none">Без фоновых частиц</option>
+                        <option value="sparks">✨ Искры магии</option>
+                        <option value="snow">🌨️ Снежинки</option>
+                        <option value="bubbles">🫧 Пузырьки</option>
+                        <option value="pixels">🔲 Пиксельный мусор</option>
+                    </select>
                 </div>
             </fieldset>
 
-            <!-- БЛОК: АНИМАЦИЯ -->
+            <!-- БЛОК: АНИМАЦИИ И ИНТЕРАКТИВ -->
             <fieldset>
-                <legend>Анимации (Компьютерные игры)</legend>
+                <legend>Анимации и Интерактив (Клик / Наведение)</legend>
                 <div class="controls">
                     <div class="slider-group">
-                        <label>Скорость анимации <span id="speedVal">Нормальная</span></label>
+                        <label>Скорость анимаций <span id="speedVal">Нормальная</span></label>
                         <input type="range" id="animSpeed" min="0.2" max="4" step="0.1" value="2" dir="rtl">
                     </div>
 
                     <select id="animContinuous">
-                        <option value="none">Покой (Без постоянной)</option>
+                        <option value="none">Покой (Без фоновой анимации)</option>
                         <option value="anim-float">🎈 Парение (Полет)</option>
+                        <option value="anim-breathe">🫁 Дыхание (AFK)</option>
                         <option value="anim-pulse">💓 Пульс (Сердцебиение)</option>
                         <option value="anim-shake">🫨 Тряска (Землетрясение)</option>
-                        <option value="anim-glitch">⚡ Глюк (Системная ошибка)</option>
-                        <option value="anim-spin">🌪️ Вращение (Водоворот)</option>
-                        <option value="anim-neon">🌟 Неон (Сияние)</option>
                         <option value="anim-wobble">🥴 Шатание (Оглушение)</option>
-                        <option value="anim-swing">🕰️ Качание (Маятник)</option>
-                        <option value="anim-breathe">🫁 Дыхание (AFK)</option>
-                        <option value="anim-ghost">👻 Призрак (Мерцание)</option>
                     </select>
 
                     <select id="animHover">
-                        <option value="none">Без анимации при наведении</option>
+                        <option value="none">Без реакции на наведение</option>
                         <option value="hover-zoom">🔍 Увеличение (Zoom)</option>
                         <option value="hover-tilt">🔄 Наклон вперед</option>
                         <option value="hover-squeeze">🥞 Сплющивание</option>
-                        <option value="hover-blur">🌫️ Размытие (Скрытность)</option>
                         <option value="hover-neon">✨ Магический отклик (Неон)</option>
                         <option value="hover-shake">💥 Дрожь (Агро)</option>
                     </select>
@@ -306,182 +284,372 @@
                     <select id="animClick">
                         <option value="none">Без анимации по клику</option>
                         <option value="click-bounce">🦘 Прыжок (Уклонение)</option>
-                        <option value="click-spin">🔄 Сальто 360 (Перекат)</option>
                         <option value="click-squish">🔨 Удар молотком (Стан)</option>
-                        <option value="click-flip">🎭 Переворот (Смена стойки)</option>
                         <option value="click-vanish">💨 Исчезновение (ТП)</option>
                         <option value="click-glitch">💻 Критический сбой</option>
                     </select>
+
+                    <input type="text" id="tooltipInput" class="text-input" placeholder="💬 Всплывающее имя (напр: Гоблин 100HP)">
+                    <input type="text" id="audioInput" class="text-input" placeholder="🎵 URL звука при клике (.mp3)">
                 </div>
             </fieldset>
         </div>
 
         <div class="buttons-group">
-            <button id="processBtn" disabled>Сгенерировать картинку</button>
+            <button id="resetBtn">Сброс</button>
+            <button id="processBtn" disabled>Сгенерировать код</button>
         </div>
     </div>
 
     <!-- ПРАВАЯ КОЛОНКА -->
     <div class="right-panel">
-        <div class="preview-box">
-            <span class="placeholder-text" id="placeholder">Загрузите картинку</span>
+        <div class="preview-box" id="previewBox">
+            <span class="placeholder-text" id="placeholder">Загрузите или вставьте ссылку</span>
             <div id="canvasWrapper">
+                <div class="particles-container" id="particlesPreview"></div>
+                <div class="preview-shadow" id="previewShadow"></div>
                 <canvas id="canvas"></canvas>
+                <div class="preview-tooltip" id="previewTooltip"></div>
             </div>
+        </div>
+        
+        <div class="bg-toggles">
+            <button onclick="setPreviewBg('#000')" title="Темный фон">⬛</button>
+            <button onclick="setPreviewBg('#fff')" title="Светлый фон">⬜</button>
+            <button onclick="setPreviewBg('checker')" title="Прозрачный фон">🏁</button>
         </div>
     </div>
 </div>
 
 <script>
-    const imageUpload = document.getElementById('imageUpload');
-    const fileName = document.getElementById('fileName');
-    const styleSelect = document.getElementById('styleSelect');
-    const flipCheck = document.getElementById('flipCheck');
-    const canvas = document.getElementById('canvas');
-    const canvasWrapper = document.getElementById('canvasWrapper');
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    
-    // Элементы управления
-    const processBtn = document.getElementById('processBtn');
-    const placeholder = document.getElementById('placeholder');
-    
-    const brightnessSlider = document.getElementById('brightnessSlider');
-    const opacitySlider = document.getElementById('opacitySlider');
-    const glowSlider = document.getElementById('glowSlider');
-    const glowColor = document.getElementById('glowColor');
-    const animSpeed = document.getElementById('animSpeed');
-    
-    const brightVal = document.getElementById('brightVal');
-    const opacityVal = document.getElementById('opacityVal');
-    const glowVal = document.getElementById('glowVal');
-    const speedVal = document.getElementById('speedVal');
-
-    const animContinuous = document.getElementById('animContinuous');
-    const animHover = document.getElementById('animHover');
-    const animClick = document.getElementById('animClick');
+    // Инициализация элементов
+    const els = {
+        imageUpload: document.getElementById('imageUpload'),
+        imageUrl: document.getElementById('imageUrl'),
+        fileName: document.getElementById('fileName'),
+        styleSelect: document.getElementById('styleSelect'),
+        toningSelect: document.getElementById('toningSelect'),
+        flipCheck: document.getElementById('flipCheck'),
+        brightnessSlider: document.getElementById('brightnessSlider'),
+        opacitySlider: document.getElementById('opacitySlider'),
+        glowSlider: document.getElementById('glowSlider'),
+        glowColor: document.getElementById('glowColor'),
+        outlineCheck: document.getElementById('outlineCheck'),
+        outlineColor: document.getElementById('outlineColor'),
+        shadowCheck: document.getElementById('shadowCheck'),
+        particlesSelect: document.getElementById('particlesSelect'),
+        animSpeed: document.getElementById('animSpeed'),
+        animContinuous: document.getElementById('animContinuous'),
+        animHover: document.getElementById('animHover'),
+        animClick: document.getElementById('animClick'),
+        tooltipInput: document.getElementById('tooltipInput'),
+        audioInput: document.getElementById('audioInput'),
+        canvas: document.getElementById('canvas'),
+        ctx: document.getElementById('canvas').getContext('2d', { willReadFrequently: true }),
+        processBtn: document.getElementById('processBtn'),
+        resetBtn: document.getElementById('resetBtn'),
+        placeholder: document.getElementById('placeholder'),
+        canvasWrapper: document.getElementById('canvasWrapper'),
+        previewShadow: document.getElementById('previewShadow'),
+        previewTooltip: document.getElementById('previewTooltip'),
+        particlesPreview: document.getElementById('particlesPreview'),
+        previewBox: document.getElementById('previewBox')
+    };
 
     let originalImage = new Image();
+    originalImage.crossOrigin = "Anonymous"; // Для загрузки по URL
     let isImageLoaded = false;
-    let isGenerated = false; // Отслеживаем состояние генерации
-    
-    // МАКСИМАЛЬНЫЙ размер для веба/Genially, чтобы код был легким
-    let maxCanvasSize = 600; 
+    let isGenerated = false;
+    let inputMode = 'file'; // 'file' или 'url'
+    let maxCanvasSize = 600;
 
-    // Загрузка картинки
-    imageUpload.addEventListener('change', function(e) {
+    // Вкладки загрузки
+    window.switchTab = function(mode) {
+        inputMode = mode;
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.upload-section').forEach(sec => sec.classList.remove('active'));
+        document.querySelector(`.tab-btn[onclick="switchTab('${mode}')"]`).classList.add('active');
+        document.getElementById(`tab-${mode}`).classList.add('active');
+        
+        if(mode === 'url' && els.imageUrl.value) loadImageUrl();
+    }
+
+    // Смена фона превью
+    window.setPreviewBg = function(bg) {
+        if(bg === 'checker') {
+            els.previewBox.style.backgroundColor = 'transparent';
+            els.previewBox.style.backgroundImage = 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)';
+        } else {
+            els.previewBox.style.backgroundImage = 'none';
+            els.previewBox.style.backgroundColor = bg;
+        }
+    }
+
+    // Загрузка файла
+    els.imageUpload.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            let displayName = file.name.length > 25 ? file.name.substring(0, 22) + '...' : file.name;
-            fileName.textContent = '📁 ' + displayName;
-
+            els.fileName.textContent = '📁 ' + (file.name.length > 25 ? file.name.substring(0, 22) + '...' : file.name);
             const reader = new FileReader();
-            reader.onload = function(event) {
-                originalImage.onload = function() {
-                    let scale = Math.min(maxCanvasSize / originalImage.width, maxCanvasSize / originalImage.height, 1);
-                    canvas.width = originalImage.width * scale;
-                    canvas.height = originalImage.height * scale;
-                    isImageLoaded = true;
-                    placeholder.style.display = 'none';
-                    applyStyle();
-                    resetButtons();
-                }
-                originalImage.src = event.target.result;
-            }
+            reader.onload = e => processImageSource(e.target.result);
             reader.readAsDataURL(file);
         }
     });
 
-    // Обновление интерфейса и рендер
-    const updateInputs = () => {
+    // Загрузка URL
+    els.imageUrl.addEventListener('input', debounce(loadImageUrl, 500));
+    function loadImageUrl() {
+        if(els.imageUrl.value.trim() !== '') processImageSource(els.imageUrl.value.trim());
+    }
+
+    function processImageSource(src) {
+        originalImage.onload = function() {
+            let scale = Math.min(maxCanvasSize / originalImage.width, maxCanvasSize / originalImage.height, 1);
+            els.canvas.width = originalImage.width * scale;
+            els.canvas.height = originalImage.height * scale;
+            isImageLoaded = true;
+            els.placeholder.style.display = 'none';
+            triggerUpdate();
+        }
+        originalImage.onerror = () => alert('Ошибка загрузки картинки. Возможно, сервер блокирует CORS. Попробуйте скачать её и загрузить как файл.');
+        originalImage.src = src;
+    }
+
+    // Функция Debounce для оптимизации ползунков
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    const triggerUpdate = () => {
         if (!isImageLoaded) return;
-        brightVal.textContent = brightnessSlider.value + '%';
-        opacityVal.textContent = opacitySlider.value + '%';
-        glowVal.textContent = glowSlider.value;
+        document.getElementById('brightVal').textContent = els.brightnessSlider.value + '%';
+        document.getElementById('opacityVal').textContent = els.opacitySlider.value + '%';
+        document.getElementById('glowVal').textContent = els.glowSlider.value;
         
-        let s = animSpeed.value;
-        speedVal.textContent = s < 1 ? "Медленно" : (s > 2.5 ? "Быстро" : "Нормальная");
+        let s = els.animSpeed.value;
+        document.getElementById('speedVal').textContent = s < 1 ? "Медленно" : (s > 2.5 ? "Быстро" : "Нормальная");
         document.documentElement.style.setProperty('--anim-speed', `${s}s`);
         
         applyStyle();
-        resetButtons();
+        updatePreviewEffects();
+        resetProcessButton();
     };
 
-    [styleSelect, flipCheck, brightnessSlider, opacitySlider, glowSlider, glowColor, animSpeed].forEach(el => {
-        el.addEventListener('input', updateInputs);
-    });
+    // Слушатели инпутов
+    const inputsToWatch = ['styleSelect', 'toningSelect', 'flipCheck', 'outlineCheck', 'shadowCheck', 'particlesSelect'];
+    inputsToWatch.forEach(id => els[id].addEventListener('change', triggerUpdate));
+    
+    const slidersToWatch = ['brightnessSlider', 'opacitySlider', 'glowSlider'];
+    slidersToWatch.forEach(id => els[id].addEventListener('input', debounce(triggerUpdate, 50)));
 
-    // Применение постоянных и ховер анимаций
-    const updateAnimations = () => {
-        canvasWrapper.className = '';
-        canvas.className = '';
-        if (animContinuous.value !== 'none') canvasWrapper.classList.add(animContinuous.value);
-        if (animHover.value !== 'none') canvas.classList.add(animHover.value);
+    els.outlineColor.addEventListener('input', debounce(triggerUpdate, 100));
+    els.glowColor.addEventListener('input', debounce(triggerUpdate, 100));
+    els.animSpeed.addEventListener('input', triggerUpdate);
+
+    // Анимации и эффекты
+    const updatePreviewEffects = () => {
+        els.canvasWrapper.className = '';
+        els.canvas.className = '';
+        if (els.animContinuous.value !== 'none') els.canvasWrapper.classList.add(els.animContinuous.value);
+        if (els.animHover.value !== 'none') els.canvas.classList.add(els.animHover.value);
+
+        // Тень
+        els.previewShadow.style.display = els.shadowCheck.checked ? 'block' : 'none';
+
+        // Имя
+        if(els.tooltipInput.value.trim() !== '') {
+            els.previewTooltip.textContent = els.tooltipInput.value;
+            els.previewTooltip.classList.add('active');
+        } else {
+            els.previewTooltip.classList.remove('active');
+        }
+
+        // Обводка через CSS (Самый производительный метод для Canvas)
+        let ol = els.outlineCheck.checked;
+        let c = els.outlineColor.value;
+        let glowV = els.glowSlider.value;
+        let glowC = els.glowColor.value;
+        
+        let dropShadowCSS = '';
+        if(ol) dropShadowCSS += `drop-shadow(2px 0 0 ${c}) drop-shadow(-2px 0 0 ${c}) drop-shadow(0 2px 0 ${c}) drop-shadow(0 -2px 0 ${c}) `;
+        if(glowV > 0) dropShadowCSS += `drop-shadow(0 0 ${glowV}px ${glowC}) `;
+        
+        els.canvas.style.filter = dropShadowCSS.trim();
+
+        // Частицы
+        generateParticlesPreview();
     };
 
-    [animContinuous, animHover, animClick].forEach(el => {
-        el.addEventListener('change', updateAnimations);
+    [els.animContinuous, els.animHover, els.animClick, els.tooltipInput].forEach(el => el.addEventListener('input', updatePreviewEffects));
+
+    // Частицы для превью
+    function generateParticlesPreview() {
+        els.particlesPreview.innerHTML = '';
+        let type = els.particlesSelect.value;
+        if(type === 'none') { els.particlesPreview.style.display = 'none'; return; }
+        els.particlesPreview.style.display = 'block';
+
+        let color = els.glowColor.value;
+        for(let i=0; i<15; i++) {
+            let p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.width = p.style.height = (Math.random() * 6 + 4) + 'px';
+            p.style.background = (type === 'snow') ? '#fff' : color;
+            if(type === 'pixels') p.style.borderRadius = '0';
+            p.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            p.style.animationDelay = (Math.random() * 2) + 's';
+            els.particlesPreview.appendChild(p);
+        }
+    }
+
+    // Клик по канвасу
+    els.canvas.addEventListener('click', () => {
+        if(els.audioInput.value.trim() !== '') {
+            new Audio(els.audioInput.value).play().catch(e=>console.log('Audio error:', e));
+        }
+        if(els.animClick.value === 'none') return;
+        let clickClass = els.animClick.value + '-trigger';
+        els.canvas.classList.remove(clickClass);
+        void els.canvas.offsetWidth;
+        els.canvas.classList.add(clickClass);
+        setTimeout(() => els.canvas.classList.remove(clickClass), 1000);
     });
 
-    // Логика анимации по КЛИКУ
-    canvas.addEventListener('click', () => {
-        if(animClick.value === 'none') return;
-        
-        let clickClass = animClick.value + '-trigger';
-        // Сброс класса для возможности повторного клика
-        canvas.classList.remove(clickClass);
-        void canvas.offsetWidth; // Магия браузера для перезапуска CSS
-        canvas.classList.add(clickClass);
-        
-        // Очищаем класс после завершения (берем с запасом 1 секунду)
-        setTimeout(() => {
-            canvas.classList.remove(clickClass);
-        }, 1000);
-    });
-
-    // Пресеты при смене стиля
-    styleSelect.addEventListener('change', () => {
-        const s = styleSelect.value;
-        if(s === 'cyberpunk') { glowColor.value = '#ff00ff'; glowSlider.value = 25; brightnessSlider.value = 110;}
-        else if(s === 'ghost') { glowColor.value = '#00ffff'; glowSlider.value = 20; opacitySlider.value = 60;}
-        else if(s === 'hologram') { glowColor.value = '#0088ff'; glowSlider.value = 15; opacitySlider.value = 80;}
-        else if(s === 'gold') { glowColor.value = '#ffd700'; glowSlider.value = 10; brightnessSlider.value = 120; opacitySlider.value = 100;}
-        else if(s === 'acid') { glowColor.value = '#39ff14'; glowSlider.value = 30; brightnessSlider.value = 150; opacitySlider.value = 100;}
-        else if(s === 'ice') { glowColor.value = '#a5f2f3'; glowSlider.value = 25; brightnessSlider.value = 130; opacitySlider.value = 90;}
-        else if(s === 'thermal') { glowColor.value = '#ff0000'; glowSlider.value = 10;}
-        else { glowSlider.value = 0; brightnessSlider.value = 100; opacitySlider.value = 100; }
-        updateInputs();
-    });
-
-    function resetButtons() {
-        processBtn.textContent = 'Сгенерировать картинку';
-        processBtn.disabled = false;
-        processBtn.style.backgroundColor = 'var(--gold)';
-        processBtn.style.color = '#000';
+    function resetProcessButton() {
+        els.processBtn.textContent = 'Сгенерировать код';
+        els.processBtn.disabled = !isImageLoaded;
+        els.processBtn.style.backgroundColor = 'var(--gold)';
+        els.processBtn.style.color = '#000';
         isGenerated = false;
     }
 
-    processBtn.addEventListener('click', function() {
+    els.resetBtn.addEventListener('click', () => {
+        document.querySelectorAll('select').forEach(s => s.value = s.options[0].value);
+        document.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+        els.brightnessSlider.value = 100;
+        els.opacitySlider.value = 100;
+        els.glowSlider.value = 0;
+        els.tooltipInput.value = '';
+        els.audioInput.value = '';
+        triggerUpdate();
+    });
+
+    // Отрисовка на Canvas (Фильтры)
+    function applyStyle() {
+        if (!isImageLoaded) return;
+
+        const style = els.styleSelect.value;
+        const toning = els.toningSelect.value;
+        const brightness = els.brightnessSlider.value;
+        const opacity = els.opacitySlider.value / 100;
+        const isFlipped = els.flipCheck.checked;
+
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = els.canvas.width; tempCanvas.height = els.canvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+
+        if (isFlipped) { tempCtx.translate(els.canvas.width, 0); tempCtx.scale(-1, 1); }
+
+        // Базовые фильтры и Тонирование (через CSS filter на canvas API)
+        let filterStr = `brightness(${brightness}%) `;
+        
+        if (style === 'sketch') filterStr += `grayscale(100%) contrast(200%) `;
+        if (style === 'cyberpunk') filterStr += `saturate(300%) hue-rotate(90deg) contrast(150%) invert(10%) `;
+        if (style === 'ghost') filterStr += `invert(80%) grayscale(50%) hue-rotate(180deg) blur(1px) `;
+        if (style === 'hologram') filterStr += `sepia(100%) hue-rotate(180deg) saturate(300%) contrast(150%) `;
+        
+        // Статусы тонирования
+        if (toning === 'poison') filterStr += `sepia(100%) hue-rotate(60deg) saturate(300%) `;
+        if (toning === 'fire') filterStr += `sepia(100%) hue-rotate(-30deg) saturate(400%) `;
+        if (toning === 'freeze') filterStr += `sepia(100%) hue-rotate(180deg) saturate(200%) brightness(120%) `;
+        if (toning === 'rage') filterStr += `sepia(100%) hue-rotate(-50deg) saturate(500%) contrast(150%) `;
+        if (toning === 'stone') filterStr += `grayscale(100%) contrast(80%) brightness(90%) `;
+
+        tempCtx.filter = filterStr.trim() || 'none';
+        tempCtx.globalAlpha = opacity;
+        tempCtx.drawImage(originalImage, 0, 0, els.canvas.width, els.canvas.height);
+        tempCtx.globalAlpha = 1.0; 
+        tempCtx.filter = 'none';
+
+        // Спецэффекты стиля (Пиксели и линии)
+        if (style === 'pixel') {
+            let pSize = 2; 
+            const w = Math.ceil(els.canvas.width / pSize), h = Math.ceil(els.canvas.height / pSize);
+            const tinyC = document.createElement('canvas');
+            tinyC.width = w; tinyC.height = h;
+            tinyC.getContext('2d').drawImage(tempCanvas, 0, 0, w, h);
+            tempCtx.clearRect(0, 0, els.canvas.width, els.canvas.height);
+            tempCtx.imageSmoothingEnabled = false;
+            tempCtx.drawImage(tinyC, 0, 0, w, h, 0, 0, els.canvas.width, els.canvas.height);
+        } 
+        else if (style === 'silhouette') {
+            tempCtx.globalCompositeOperation = 'source-in';
+            tempCtx.fillStyle = '#050505';
+            tempCtx.fillRect(0, 0, els.canvas.width, els.canvas.height);
+            tempCtx.globalCompositeOperation = 'source-over';
+        }
+
+        els.ctx.clearRect(0, 0, els.canvas.width, els.canvas.height);
+        els.ctx.setTransform(1, 0, 0, 1, 0, 0); 
+        els.ctx.drawImage(tempCanvas, 0, 0, els.canvas.width, els.canvas.height);
+    }
+
+    // ГЕНЕРАЦИЯ КОДА ДЛЯ GENIALLY
+    els.processBtn.addEventListener('click', function() {
         if (!isImageLoaded) return;
         
         if (!isGenerated) {
-            // ЭТАП 1: ГЕНЕРАЦИЯ
-            processBtn.textContent = 'Обработка пикселей... ⚡';
-            processBtn.disabled = true;
+            els.processBtn.textContent = 'Компиляция магии... ⚡';
+            els.processBtn.disabled = true;
             setTimeout(() => {
-                processBtn.textContent = 'Скопировать';
-                processBtn.disabled = false;
+                els.processBtn.textContent = 'Скопировать код';
+                els.processBtn.disabled = false;
                 isGenerated = true;
-            }, 600);
+            }, 500);
         } else {
-            // ЭТАП 2: КОПИРОВАНИЕ ДЛЯ GENIALLY
-            const base64Image = canvas.toDataURL('image/webp', 0.7);
-            const cont = animContinuous.value;
-            const hov = animHover.value;
-            const clk = animClick.value;
-            const speed = animSpeed.value;
-            const glowC = glowColor.value;
+            // ОПРЕДЕЛЯЕМ ИСТОЧНИК (URL или Base64)
+            // Если выбран URL, мы используем его напрямую, чтобы код был микроскопическим!
+            // Но если пользователь наложил сложные пиксельные фильтры, нам придется отдать Base64.
+            let finalImageSrc = '';
+            let requiresCanvasEncode = els.styleSelect.value === 'pixel' || els.styleSelect.value === 'silhouette' || els.flipCheck.checked || els.toningSelect.value !== 'none';
             
+            if (inputMode === 'url' && !requiresCanvasEncode) {
+                // Идеальный вариант: прямая ссылка + CSS фильтры
+                finalImageSrc = els.imageUrl.value;
+            } else {
+                // Если файл с ПК или сложный фильтр — кодируем Canvas
+                finalImageSrc = els.canvas.toDataURL('image/webp', 0.8);
+            }
+
+            const cont = els.animContinuous.value;
+            const hov = els.animHover.value;
+            const clk = els.animClick.value;
+            const speed = els.animSpeed.value;
+            const tooltip = els.tooltipInput.value.replace(/"/g, '&quot;');
+            const audioStr = els.audioInput.value;
+            
+            // Сборка фильтров для CSS (если источник URL без рендера)
+            let imgCssFilter = '';
+            if(inputMode === 'url' && !requiresCanvasEncode) {
+               imgCssFilter = `brightness(${els.brightnessSlider.value}%) opacity(${els.opacitySlider.value}%) `;
+            }
+
+            // Добавляем Outline и Glow в CSS
+            let ol = els.outlineCheck.checked;
+            let c = els.outlineColor.value;
+            let glowV = els.glowSlider.value;
+            let glowC = els.glowColor.value;
+            if(ol) imgCssFilter += `drop-shadow(2px 0 0 ${c}) drop-shadow(-2px 0 0 ${c}) drop-shadow(0 2px 0 ${c}) drop-shadow(0 -2px 0 ${c}) `;
+            if(glowV > 0) imgCssFilter += `drop-shadow(0 0 ${glowV}px ${glowC}) `;
+
+            // Логика скриптов (Клик + Аудио)
             let scriptBlock = "";
+            let clickLogic = "";
             if(clk !== 'none') {
                 let animName = clk.replace('click-', '');
                 let t = "0.5s ease forwards";
@@ -490,176 +658,110 @@
                 if(animName === 'vanish') t = "0.5s forwards";
                 if(animName === 'flip') t = "0.6s forwards";
                 if(animName === 'glitch') t = "0.3s linear infinite";
+                clickLogic = `this.style.animation = 'none'; void this.offsetWidth; this.style.animation = '${animName} ${t}'; setTimeout(() => { this.style.animation = ''; }, 1000);`;
+            }
+            if(audioStr !== '') clickLogic += `new Audio('${audioStr}').play();`;
 
-                scriptBlock = `
-<script>
-  const img = document.getElementById('gen-img');
-  if(img) {
-      img.addEventListener('click', function() {
-          this.style.animation = 'none';
-          void this.offsetWidth;
-          this.style.animation = '${animName} ${t}';
-          setTimeout(() => { this.style.animation = ''; }, 1000);
-      });
-  }
-<\/script>`;
+            if(clickLogic !== '') {
+                scriptBlock = `\n<script>document.getElementById('g-img').addEventListener('click', function() { ${clickLogic} });<\/script>`;
             }
 
-            // ИСПРАВЛЕННЫЙ HTML КОД ДЛЯ GENIALLY (Исправлено обрезание/центрирование)
+            // Тень и частицы
+            let shadowHTML = els.shadowCheck.checked ? '<div class="g-shadow"></div>' : '';
+            
+            let particlesHTML = '';
+            let pType = els.particlesSelect.value;
+            if(pType !== 'none') {
+                particlesHTML += '<div class="p-wrap">';
+                for(let i=0; i<15; i++) {
+                    let rad = (pType === 'pixels') ? '0' : '50%';
+                    let bg = (pType === 'snow') ? '#fff' : glowC;
+                    let size = (Math.random() * 6 + 4) + 'px';
+                    let left = Math.random() * 100 + '%';
+                    let dur = (Math.random() * 2 + 2) + 's';
+                    let del = (Math.random() * 2) + 's';
+                    particlesHTML += `<div style="position:absolute; bottom:-20px; left:${left}; width:${size}; height:${size}; background:${bg}; border-radius:${rad}; animation: p-anim ${dur} linear infinite ${del}; opacity:0;"></div>`;
+                }
+                particlesHTML += '</div>';
+            }
+
+            // Тултип
+            let tooltipHTML = tooltip ? `<div class="g-tt">${tooltip}</div>` : '';
+
+            // ФИНАЛЬНЫЙ HTML КОД
             const geniallyCode = `<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <style>
-  /* Убрали жесткие центрирования, которые конфликтовали с Genially */
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
-  .g-wrap { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; --anim-speed: ${speed}s; }
-  .g-img { width: 100%; height: 100%; object-fit: contain; cursor: pointer; transition: 0.3s ease; display: block; }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; font-family: sans-serif;}
+  .g-cont { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; position: relative; --anim-speed: ${speed}s; }
+  .g-wrap { position: relative; display: inline-flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
   
-  /* Константы анимации */
+  #g-img { width: 100%; height: 100%; object-fit: contain; cursor: pointer; transition: 0.3s ease; display: block; position: relative; z-index: 5; filter: ${imgCssFilter || 'none'}; }
+  
+  /* Тень на полу */
+  .g-shadow { position: absolute; bottom: 5%; width: 50%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, transparent 70%); border-radius: 50%; z-index: 1; }
+  
+  /* Тултип */
+  .g-tt { position: absolute; top: 10%; background: rgba(0,0,0,0.8); border: 1px solid ${glowC}; color: ${glowC}; padding: 5px 15px; border-radius: 5px; font-size: 14px; font-weight: bold; opacity: 0; transition: 0.3s; z-index: 10; pointer-events: none; transform: translateY(10px); text-align: center;}
+  #g-img:hover ~ .g-tt { opacity: 1; transform: translateY(0); }
+  
+  /* Частицы */
+  .p-wrap { position: absolute; width: 100%; height: 100%; top:0; left:0; z-index: 2; pointer-events: none; overflow: hidden; }
+  @keyframes p-anim { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(-50px) scale(1.5); opacity: 0; } }
+
+  /* Анимации */
   .anim-float { animation: float var(--anim-speed) ease-in-out infinite; }
   .anim-pulse { animation: pulse calc(var(--anim-speed) / 1.5) infinite; }
   .anim-breathe { animation: breathe var(--anim-speed) ease-in-out infinite; }
   .anim-wobble { animation: wobble var(--anim-speed) ease-in-out infinite; }
-  .anim-glitch { animation: glitch calc(var(--anim-speed) / 6) linear infinite; }
-  .anim-spin { animation: spin var(--anim-speed) linear infinite; }
-  .anim-neon { animation: neon calc(var(--anim-speed) / 1.5) alternate infinite; }
-  .anim-swing { animation: swing var(--anim-speed) ease-in-out infinite; transform-origin: top center; }
-  .anim-shake { animation: shake calc(var(--anim-speed) / 4) infinite; }
-  .anim-ghost { animation: ghost var(--anim-speed) infinite alternate; }
-
-  /* Ховеры */
+  
   .hover-zoom:hover { transform: scale(1.15); }
-  .hover-blur:hover { filter: blur(5px); }
   .hover-tilt:hover { transform: rotate(15deg) scale(1.05); }
   .hover-squeeze:hover { transform: scaleY(0.8) scaleX(1.2); }
   .hover-neon:hover { animation: neon calc(var(--anim-speed) / 2) alternate infinite; }
   .hover-shake:hover { animation: shake 0.3s infinite; }
 
-  /* Ключевые кадры */
   @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
   @keyframes pulse { 0%, 100% { transform: scale(1); filter: brightness(100%);} 50% { transform: scale(1.08); filter: brightness(130%); } }
   @keyframes breathe { 0%, 100% { transform: scaleY(1) scaleX(1); } 50% { transform: scaleY(1.05) scaleX(0.98); } }
   @keyframes wobble { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
-  @keyframes glitch { 0% { transform: translate(0) } 20% { transform: translate(-3px, 3px) } 40% { transform: translate(-3px, -3px) } 60% { transform: translate(3px, 3px) } 80% { transform: translate(3px, -3px) } 100% { transform: translate(0) } }
   @keyframes bounce { 0% { transform: translateY(0); } 40% { transform: translateY(-60px) scaleY(1.1); } 100% { transform: translateY(0) scaleY(1); } }
   @keyframes spin { 100% { transform: rotate(360deg); } }
-  @keyframes neon { 0% { filter: brightness(100%) drop-shadow(0 0 5px ${glowC || '#dfb23e'}); } 100% { filter: brightness(150%) drop-shadow(0 0 20px ${glowC || '#dfb23e'}); } }
-  @keyframes swing { 20% { transform: rotate(15deg); } 40% { transform: rotate(-10deg); } 60% { transform: rotate(5deg); } 80% { transform: rotate(-5deg); } 100% { transform: rotate(0deg); } }
+  @keyframes neon { 0% { filter: brightness(100%) drop-shadow(0 0 5px ${glowC}); } 100% { filter: brightness(150%) drop-shadow(0 0 20px ${glowC}); } }
   @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
-  @keyframes ghost { 0% { opacity: 1; filter: grayscale(0%);} 100% { opacity: 0.3; filter: grayscale(80%) blur(2px);} }
   @keyframes squish { 0%, 100% { transform: scale(1); } 50% { transform: scaleY(0.4) scaleX(1.5) translateY(30%); } }
   @keyframes vanish { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(2); } }
   @keyframes flip { 0% { transform: perspective(400px) rotateY(0deg); } 100% { transform: perspective(400px) rotateY(360deg); } }
+  @keyframes glitch { 0% { transform: translate(0) } 20% { transform: translate(-3px, 3px) } 40% { transform: translate(-3px, -3px) } 60% { transform: translate(3px, 3px) } 80% { transform: translate(3px, -3px) } 100% { transform: translate(0) } }
 </style>
 </head>
 <body>
-<div class="g-wrap ${cont !== 'none' ? cont : ''}">
-  <img id="gen-img" src="${base64Image}" class="g-img ${hov !== 'none' ? hov : ''}">
+<div class="g-cont">
+  <div class="g-wrap ${cont !== 'none' ? cont : ''}">
+    ${particlesHTML}
+    ${shadowHTML}
+    <img id="g-img" src="${finalImageSrc}" class="${hov !== 'none' ? hov : ''}">
+    ${tooltipHTML}
+  </div>
 </div>
 ${scriptBlock}
 </body>
 </html>`;
             
             navigator.clipboard.writeText(geniallyCode).then(() => {
-                processBtn.textContent = '✅ Скопировано!';
-                processBtn.style.backgroundColor = '#4CAF50'; // Зеленый цвет
-                processBtn.style.color = '#fff';
+                els.processBtn.textContent = '✅ Код скопирован!';
+                els.processBtn.style.backgroundColor = '#4CAF50';
+                els.processBtn.style.color = '#fff';
                 setTimeout(() => {
-                    processBtn.textContent = 'Скопировать';
-                    processBtn.style.backgroundColor = 'var(--gold)';
-                    processBtn.style.color = '#000';
+                    els.processBtn.textContent = 'Скопировать код';
+                    els.processBtn.style.backgroundColor = 'var(--gold)';
+                    els.processBtn.style.color = '#000';
                 }, 3000);
-            }).catch(err => {
-                alert('Ошибка копирования. Ваш браузер блокирует буфер обмена.');
-            });
+            }).catch(() => alert('Ошибка. Браузер блокирует буфер обмена.'));
         }
     });
-
-    // МАТЕМАТИКА ОТРИСОВКИ
-    function applyStyle() {
-        if (!isImageLoaded) return;
-
-        const style = styleSelect.value;
-        const brightness = brightnessSlider.value;
-        const opacity = opacitySlider.value / 100;
-        const glowV = glowSlider.value;
-        const glowC = glowColor.value;
-        const isFlipped = flipCheck.checked;
-
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
-        const tempCtx = tempCanvas.getContext('2d');
-
-        if (isFlipped) {
-            tempCtx.translate(canvas.width, 0);
-            tempCtx.scale(-1, 1);
-        }
-
-        let filterStr = `brightness(${brightness}%)`;
-        
-        if (style === 'sketch') filterStr += ` grayscale(100%) contrast(200%)`;
-        if (style === 'cyberpunk') filterStr += ` saturate(300%) hue-rotate(90deg) contrast(150%) invert(10%)`;
-        if (style === 'ghost') filterStr += ` invert(80%) grayscale(50%) hue-rotate(180deg) blur(1px)`;
-        if (style === 'hologram') filterStr += ` sepia(100%) hue-rotate(180deg) saturate(300%) contrast(150%)`;
-        if (style === 'thermal') filterStr += ` invert(100%) hue-rotate(180deg) saturate(500%) contrast(200%)`;
-        if (style === 'acid') filterStr += ` saturate(500%) hue-rotate(270deg) contrast(200%) invert(20%)`;
-        if (style === 'gold') filterStr += ` sepia(100%) contrast(150%) saturate(200%) hue-rotate(15deg) drop-shadow(2px 4px 6px black)`;
-        if (style === 'ice') filterStr += ` sepia(100%) hue-rotate(180deg) saturate(100%) contrast(120%) brightness(150%)`;
-        if (style === 'crt') filterStr += ` saturate(200%) contrast(150%) blur(0.5px)`;
-
-        tempCtx.filter = filterStr;
-        tempCtx.globalAlpha = opacity;
-        tempCtx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
-        tempCtx.globalAlpha = 1.0; 
-        tempCtx.filter = 'none';
-
-        if (style === 'pixel') {
-            let pSize = 2; // Уменьшен размер пикселя, чтобы не съедались лица
-            const w = Math.ceil(canvas.width / pSize);
-            const h = Math.ceil(canvas.height / pSize);
-            const tinyC = document.createElement('canvas');
-            tinyC.width = w; tinyC.height = h;
-            const tCtx = tinyC.getContext('2d');
-            tCtx.filter = 'contrast(115%) saturate(110%)'; // Легкий контраст для выделения черт
-            tCtx.drawImage(tempCanvas, 0, 0, w, h);
-            
-            tempCtx.clearRect(0, 0, canvas.width, canvas.height);
-            tempCtx.imageSmoothingEnabled = false;
-            tempCtx.drawImage(tinyC, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
-        } 
-        else if (style === 'silhouette') {
-            tempCtx.globalCompositeOperation = 'source-in';
-            tempCtx.fillStyle = '#050505';
-            tempCtx.fillRect(0, 0, canvas.width, canvas.height);
-            tempCtx.globalCompositeOperation = 'source-over';
-        } 
-        else if (style === 'hologram' || style === 'crt') {
-            tempCtx.globalCompositeOperation = 'source-atop';
-            tempCtx.fillStyle = style === 'hologram' ? 'rgba(0, 255, 255, 0.15)' : 'rgba(0,0,0,0.3)';
-            let step = style === 'hologram' ? 4 : 3;
-            for(let y = 0; y < canvas.height; y += step) {
-                tempCtx.fillRect(0, y, canvas.width, 1.5);
-            }
-            if (style === 'crt') {
-                tempCtx.globalCompositeOperation = 'screen';
-                tempCtx.fillStyle = 'rgba(255,0,0,0.1)';
-                tempCtx.fillRect(2, 0, canvas.width, canvas.height);
-                tempCtx.fillStyle = 'rgba(0,0,255,0.1)';
-                tempCtx.fillRect(-2, 0, canvas.width, canvas.height);
-            }
-            tempCtx.globalCompositeOperation = 'source-over';
-        }
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.shadowColor = glowV > 0 ? glowC : 'transparent';
-        ctx.shadowBlur = parseInt(glowV);
-        ctx.imageSmoothingEnabled = true;
-
-        ctx.setTransform(1, 0, 0, 1, 0, 0); 
-        ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
-    }
 </script>
 
 </body>
