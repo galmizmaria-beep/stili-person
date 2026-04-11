@@ -627,7 +627,7 @@
             
             if(audioStr !== '') clickLogic += `new Audio('${audioStr}').play();`;
 
-            // Скрипт теперь всегда добавляется, чтобы предотвратить переход на следующий слайд при клике
+            // Скрипт
             scriptBlock = `\n<script>document.getElementById('g-img').addEventListener('click', function(e) { ${clickLogic} });<\/script>`;
 
             let shadowHTML = els.shadowCheck.checked ? '<div class="g-shadow"></div>' : '';
@@ -650,17 +650,17 @@
 
             let tooltipHTML = tooltip ? `<div class="g-tt">${tooltip}</div>` : '';
 
-            // ФИНАЛЬНЫЙ HTML КОД (добавлен pointer-events: none на фон и pointer-events: auto на саму картинку)
+            // ФИНАЛЬНЫЙ HTML КОД. ОЧИЩЕН ОТ pointer-events: none на body
             const geniallyCode = `<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <style>
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; font-family: sans-serif; pointer-events: none;}
-  .g-cont { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; position: relative; --anim-speed: ${speed}s; pointer-events: none;}
-  .g-wrap { position: relative; display: inline-flex; justify-content: center; align-items: center; width: 100%; height: 100%; pointer-events: none;}
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; font-family: sans-serif; }
+  .g-cont { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; position: relative; --anim-speed: ${speed}s; }
+  .g-wrap { position: relative; display: inline-flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
   
-  #g-img { width: 100%; height: 100%; object-fit: contain; cursor: pointer; transition: 0.3s ease; display: block; position: relative; z-index: 5; filter: ${imgCssFilter || 'none'}; pointer-events: auto;}
+  #g-img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: pointer; transition: 0.3s ease; position: relative; z-index: 5; filter: ${imgCssFilter || 'none'}; }
   
   .g-shadow { position: absolute; bottom: 5%; width: 50%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, transparent 70%); border-radius: 50%; z-index: 1; pointer-events: none; }
   
