@@ -3,192 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Продвинутый редактор персонажа</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <title>Генератор персонажей для Genially</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #121110;
-            --bg-panel: #1e1d1a;
-            --gold: #dfb23e;
-            --gold-hover: #f1c75c;
+            --bg-dark: #0f0c1b;
+            --bg-panel: #1a1625;
+            --accent: #00e5ff;
+            --accent-hover: #00b3cc;
             --text-light: #e0e0e0;
-            --font-heading: 'Cormorant Garamond', serif;
             --font-main: 'Montserrat', sans-serif;
+            --anim-speed: 2s; /* Переменная скорости */
         }
 
         body {
             background-color: var(--bg-dark);
             color: var(--text-light);
             font-family: var(--font-main);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            background-image: radial-gradient(circle at 50% 0%, #302a1c 0%, var(--bg-dark) 70%);
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #2a1f45 0%, var(--bg-dark) 80%);
         }
 
         .editor-container {
             background-color: var(--bg-panel);
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.9), 0 0 20px rgba(223, 178, 62, 0.15);
-            width: 95%;
-            max-width: 1300px;
-            height: 92vh;
-            display: flex;
-            gap: 25px;
-            box-sizing: border-box;
+            padding: 20px; border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9), 0 0 20px rgba(0, 229, 255, 0.1);
+            width: 95%; max-width: 1300px; height: 95vh;
+            display: flex; gap: 20px; box-sizing: border-box;
         }
 
         /* ЛЕВАЯ ПАНЕЛЬ */
         .left-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            padding-right: 15px;
-            gap: 15px;
+            flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding-right: 15px; gap: 10px;
         }
 
         .left-panel::-webkit-scrollbar { width: 6px; }
-        .left-panel::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 10px; }
-        .left-panel::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+        .left-panel::-webkit-scrollbar-track { background: #111; border-radius: 10px; }
+        .left-panel::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
-        /* ПРАВАЯ ПАНЕЛЬ */
-        .right-panel {
-            flex: 1.3;
-            display: flex;
-            flex-direction: column;
-        }
+        .right-panel { flex: 1.3; display: flex; flex-direction: column; position: relative; }
 
-        h1 {
-            font-family: var(--font-heading);
-            color: var(--gold);
-            font-size: 2em;
-            margin: 0 0 5px 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
-        p.subtitle { font-size: 0.8em; color: #a0a0a0; margin: 0 0 15px 0; }
+        h1 { color: var(--accent); font-size: 1.5em; margin: 0 0 5px 0; text-transform: uppercase; font-weight: 800;}
+        p.subtitle { font-size: 0.75em; color: #a0a0a0; margin: 0 0 10px 0; }
 
         fieldset {
-            border: 1px solid #444;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            background: rgba(0,0,0,0.2);
+            border: 1px solid #333; border-radius: 8px; padding: 12px; background: rgba(0,0,0,0.3); margin-bottom: 5px;
         }
+        legend { color: var(--accent); font-weight: 600; font-size: 0.85em; padding: 0 10px; text-transform: uppercase; letter-spacing: 1px;}
 
-        legend {
-            color: var(--gold);
-            font-weight: 600;
-            font-size: 0.9em;
-            padding: 0 10px;
-        }
-
-        .controls { display: flex; flex-direction: column; gap: 12px; }
-
+        .controls { display: flex; flex-direction: column; gap: 10px; }
         input[type="file"] { display: none; }
 
         .custom-file-upload {
-            border: 2px dashed var(--gold);
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            color: var(--gold);
-            font-weight: 600;
-            text-align: center;
-            display: block;
+            border: 2px dashed var(--accent); padding: 10px; border-radius: 8px;
+            cursor: pointer; transition: 0.3s; color: var(--accent); font-weight: 600; text-align: center;
         }
-
-        .custom-file-upload:hover { background-color: rgba(223, 178, 62, 0.1); }
+        .custom-file-upload:hover { background-color: rgba(0, 229, 255, 0.1); }
 
         select {
-            width: 100%;
-            padding: 10px;
-            background-color: #111;
-            color: var(--text-light);
-            border: 1px solid #555;
-            border-radius: 8px;
-            font-family: var(--font-main);
-            font-size: 0.85em;
-            outline: none;
-            cursor: pointer;
+            width: 100%; padding: 8px; background-color: #111; color: var(--text-light);
+            border: 1px solid #444; border-radius: 6px; font-family: var(--font-main); font-size: 0.85em; cursor: pointer;
         }
 
-        .slider-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px;}
-        .slider-group label { font-size: 0.8em; color: #ccc; display: flex; justify-content: space-between; }
-
+        .slider-group { display: flex; flex-direction: column; gap: 5px; }
+        .slider-group label { font-size: 0.75em; color: #ccc; display: flex; justify-content: space-between; }
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: var(--gold); cursor: pointer; margin-top: -5px; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: #555; border-radius: 2px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; margin-top: -5px; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: #444; border-radius: 2px; }
 
-        .color-picker-group { display: flex; justify-content: space-between; align-items: center; font-size: 0.85em; }
-        input[type="color"] { border: none; width: 40px; height: 30px; border-radius: 5px; cursor: pointer; background: none; }
+        .color-group { display: flex; justify-content: space-between; align-items: center; font-size: 0.8em; }
+        input[type="color"] { border: none; width: 30px; height: 30px; border-radius: 5px; cursor: pointer; background: none; }
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border: 1px solid #666; border-radius: 5px; }
 
-        .checkbox-group { display: flex; align-items: center; gap: 10px; font-size: 0.85em; cursor: pointer; color: #ccc;}
-
         .buttons-group { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
         button {
-            background-color: var(--gold); color: #000; border: none; padding: 12px; border-radius: 8px;
-            font-family: var(--font-main); font-weight: 600; cursor: pointer; transition: 0.3s;
+            background-color: var(--accent); color: #000; border: none; padding: 12px; border-radius: 8px;
+            font-family: var(--font-main); font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase;
         }
-        button:hover { background-color: var(--gold-hover); transform: translateY(-2px); }
-        button:disabled { background-color: #444; color: #777; cursor: not-allowed; transform: none; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,229,255,0.4); }
+        button:disabled { background-color: #333; color: #666; cursor: not-allowed; box-shadow: none; transform: none;}
 
-        #downloadBtn { display: none; background-color: transparent; color: var(--gold); border: 2px solid var(--gold); }
-        #downloadBtn:hover { background-color: var(--gold); color: #000; }
-
-        /* ПРЕВЬЮ И АНИМАЦИИ */
         .preview-box {
-            width: 100%; height: 100%; background-color: #000; border-radius: 10px; display: flex;
+            width: 100%; height: 100%; background-color: #050505; border-radius: 10px; display: flex;
             justify-content: center; align-items: center; overflow: hidden; position: relative;
             background-image: linear-gradient(45deg, #111 25%, transparent 25%), linear-gradient(-45deg, #111 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #111 75%), linear-gradient(-45deg, transparent 75%, #111 75%);
-            background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-            border: 1px solid #333;
+            background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px; border: 1px solid #333;
         }
 
-        #canvasWrapper {
-            display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; transition: all 0.3s ease;
+        #canvasWrapper { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
+        canvas { max-width: 90%; max-height: 90%; object-fit: contain; transition: transform 0.3s ease, filter 0.3s ease; }
+
+        /* Всплывающее окно для кода */
+        #codeModal {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; border-radius: 10px;
         }
+        textarea { width: 90%; height: 60%; background: #111; color: #0f0; font-family: monospace; padding: 15px; border: 1px solid var(--accent); border-radius: 8px; resize: none; margin-bottom: 15px;}
+        .close-btn { background: #ff3366; color: white; width: 50%; }
 
-        canvas { max-width: 90%; max-height: 90%; object-fit: contain; transition: all 0.3s ease; }
+        /* --- АНИМАЦИИ (Применяются через JS и передаются в iframe) --- */
+        .anim-idle { animation: idle var(--anim-speed) ease-in-out infinite; }
+        .anim-float { animation: float var(--anim-speed) ease-in-out infinite; }
+        .anim-pulse { animation: pulse var(--anim-speed) infinite; }
+        .anim-shake { animation: shake calc(var(--anim-speed) / 5) infinite; }
+        .anim-glitch { animation: glitch calc(var(--anim-speed) / 4) infinite linear; }
+        .anim-spin { animation: spin var(--anim-speed) linear infinite; }
+        .anim-neon { animation: neon var(--anim-speed) alternate infinite; }
+        .anim-wobble { animation: wobble var(--anim-speed) ease-in-out infinite; }
+        .anim-swing { animation: swing var(--anim-speed) ease-in-out infinite; }
+        .anim-ghost { animation: ghost var(--anim-speed) infinite; }
 
-        .placeholder-text { position: absolute; color: #666; background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 10px; font-size: 0.9em;}
-
-        /* ПОСТОЯННЫЕ АНИМАЦИИ */
-        .anim-float { animation: float 3s ease-in-out infinite; }
-        .anim-pulse { animation: pulse 2s infinite; }
-        .anim-breathe { animation: breathe 4s ease-in-out infinite; }
-        .anim-glitch { animation: glitch 0.3s linear infinite; }
-        .anim-wobble { animation: wobble 2s ease-in-out infinite; }
-
-        /* АНИМАЦИИ ПРИ НАВЕДЕНИИ */
+        /* Hover классы */
         .hover-zoom:hover { transform: scale(1.15) !important; }
-        .hover-blur:hover { filter: blur(5px); }
         .hover-tilt:hover { transform: rotate(15deg) scale(1.05) !important; }
         .hover-squeeze:hover { transform: scaleY(0.8) scaleX(1.2) !important; }
-        .hover-neon:hover { drop-shadow: 0 0 20px var(--gold); filter: brightness(150%); }
+        .hover-blur:hover { filter: blur(5px); }
+        .hover-jiggle:hover { animation: shake 0.2s infinite; }
 
-        /* АНИМАЦИИ ПО КЛИКУ */
-        .click-spin:active { transform: rotate(360deg) scale(0.5) !important; transition: 0.5s; }
-        .click-squish:active { transform: scaleY(0.5) scaleX(1.5) translateY(20%) !important; transition: 0.1s; }
-        .click-bounce:active { animation: bounce 0.4s ease; }
-        .click-vanish:active { opacity: 0; transform: scale(2); transition: 0.2s; }
+        /* Click классы (добавляются JS-ом на время duration) */
+        .click-bounce { animation: bounce 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) forwards !important; }
+        .click-flip { animation: flip 0.6s ease forwards !important; }
+        .click-squish { animation: squish 0.3s ease forwards !important; }
+        .click-damage { animation: damage 0.4s ease forwards !important; }
+        .click-vanish { animation: vanish 0.6s forwards !important; }
 
-        /* KEYFRAMES */
+        /* КЛЮЧЕВЫЕ КАДРЫ */
+        @keyframes idle { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.03) scaleX(0.98); } }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); filter: brightness(120%); } 100% { transform: scale(1); } }
-        @keyframes breathe { 0%, 100% { transform: scaleY(1) scaleX(1); } 50% { transform: scaleY(1.05) scaleX(0.98); } }
-        @keyframes wobble { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
-        @keyframes glitch { 0% { transform: translate(0) } 20% { transform: translate(-2px, 2px) } 40% { transform: translate(-2px, -2px) } 60% { transform: translate(2px, 2px) } 80% { transform: translate(2px, -2px) } 100% { transform: translate(0) } }
-        @keyframes bounce { 0% { transform: translateY(0); } 50% { transform: translateY(-40px); } 100% { transform: translateY(0); } }
+        @keyframes pulse { 0% { transform: scale(1); filter: brightness(100%);} 50% { transform: scale(1.05); filter: brightness(130%); } 100% { transform: scale(1); filter: brightness(100%); } }
+        @keyframes shake { 0%, 100% { transform: translate(0,0) rotate(0); } 25% { transform: translate(-3px, 2px) rotate(-2deg); } 50% { transform: translate(3px, -2px) rotate(2deg); } 75% { transform: translate(-3px, -2px) rotate(-1deg); } }
+        @keyframes glitch { 0% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 2px); } 20% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); } 40% { clip-path: inset(40% 0 40% 0); transform: translate(-2px, 2px); } 60% { clip-path: inset(10% 0 60% 0); transform: translate(2px, 2px); } 80% { clip-path: inset(50% 0 30% 0); transform: translate(-2px, -2px); } 100% { clip-path: inset(0 0 0 0); transform: translate(0); } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes neon { 0% { filter: drop-shadow(0 0 5px var(--accent)) brightness(100%); } 100% { filter: drop-shadow(0 0 25px var(--accent)) brightness(150%); } }
+        @keyframes wobble { 0%, 100% { transform: translateX(0%) rotate(0deg); } 15% { transform: translateX(-15px) rotate(-5deg); } 30% { transform: translateX(10px) rotate(3deg); } 45% { transform: translateX(-10px) rotate(-3deg); } 60% { transform: translateX(5px) rotate(2deg); } 75% { transform: translateX(-5px) rotate(-1deg); } }
+        @keyframes swing { 20% { transform: rotate3d(0, 0, 1, 15deg); } 40% { transform: rotate3d(0, 0, 1, -10deg); } 60% { transform: rotate3d(0, 0, 1, 5deg); } 80% { transform: rotate3d(0, 0, 1, -5deg); } to { transform: rotate3d(0, 0, 1, 0deg); } }
+        @keyframes ghost { 0%, 100% { opacity: 1; filter: blur(0px); } 50% { opacity: 0.3; filter: blur(3px); transform: scale(1.05); } }
+        
+        /* Клик-кейфреймы */
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-40px) scaleY(1.1); } 70% { transform: translateY(0) scaleY(0.9); } }
+        @keyframes flip { 0% { transform: perspective(400px) rotateY(0); } 100% { transform: perspective(400px) rotateY(360deg); } }
+        @keyframes squish { 0%, 100% { transform: scale(1,1); } 50% { transform: scale(1.5, 0.5) translateY(20px); } }
+        @keyframes damage { 0%, 100% { filter: brightness(100%); transform: translateX(0); } 20% { filter: brightness(200%) hue-rotate(-50deg) saturate(300%); transform: translateX(-10px); } 40% { transform: translateX(10px); } 60% { transform: translateX(-10px); } }
+        @keyframes vanish { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(2) translateY(-20px); filter: blur(10px); } }
 
     </style>
 </head>
@@ -198,108 +157,103 @@
     <!-- ЛЕВАЯ КОЛОНКА -->
     <div class="left-panel">
         <div>
-            <h1>Редактор персонажа</h1>
-            <p class="subtitle">Настрой стиль, цвет и выбери эффекты анимации</p>
-
+            <h1>Спрайт Генератор</h1>
             <label class="custom-file-upload">
                 <input type="file" id="imageUpload" accept="image/png, image/jpeg, image/webp">
                 <span id="fileName">📁 Загрузить картинку (без фона)</span>
             </label>
 
-            <!-- БЛОК: ВНЕШНИЙ ВИД -->
             <fieldset>
-                <legend>Внешний вид и фильтры</legend>
+                <legend>Внешний вид</legend>
                 <div class="controls">
                     <select id="styleSelect">
                         <option value="none">Оригинал (Без стиля)</option>
                         <option value="pixel">👾 8-bit Пиксель-арт</option>
-                        <option value="sketch">✏️ Карандашный скетч</option>
-                        <option value="cyberpunk">🌃 Киберпанк-неон</option>
+                        <option value="cyberpunk">🌃 Киберпанк</option>
                         <option value="hologram">💿 Голограмма</option>
-                        <option value="silhouette">🥷 Силуэт ниндзя</option>
-                        <option value="ghost">👻 Призрак</option>
-                        <option value="thermal">🌡️ Тепловизор (Хищник)</option>
-                        <option value="acid">🍄 Кислотный трип</option>
+                        <option value="silhouette">🥷 Силуэт</option>
+                        <option value="thermal">🌡️ Тепловизор</option>
                         <option value="gold">🏆 Золотая статуя</option>
-                        <option value="ice">❄️ Ледяной кристалл</option>
-                        <option value="crt">📺 Ретро CRT-монитор</option>
+                        <option value="stone">🗿 Окаменение</option>
                     </select>
 
-                    <label class="checkbox-group">
-                        <input type="checkbox" id="flipCheck"> Отразить по горизонтали (поворот)
-                    </label>
-
-                    <div class="slider-group">
-                        <label>Прозрачность <span id="opacityVal">100%</span></label>
-                        <input type="range" id="opacitySlider" min="10" max="100" value="100">
-                    </div>
                     <div class="slider-group">
                         <label>Яркость <span id="brightVal">100%</span></label>
                         <input type="range" id="brightnessSlider" min="10" max="250" value="100">
                     </div>
-                </div>
-            </fieldset>
-
-            <!-- БЛОК: СВЕЧЕНИЕ -->
-            <fieldset>
-                <legend>Магическое свечение</legend>
-                <div class="controls">
                     <div class="slider-group">
-                        <label>Интенсивность <span id="glowVal">0</span></label>
+                        <label>Свечение <span id="glowVal">0</span></label>
                         <input type="range" id="glowSlider" min="0" max="80" value="0">
                     </div>
-                    <div class="color-picker-group">
-                        <label for="glowColor">Цвет (кликни для пипетки):</label>
-                        <input type="color" id="glowColor" value="#dfb23e" title="Выберите цвет или используйте пипетку">
+                    <div class="color-group">
+                        <label for="glowColor">Цвет свечения:</label>
+                        <input type="color" id="glowColor" value="#00e5ff">
                     </div>
                 </div>
             </fieldset>
 
-            <!-- БЛОК: АНИМАЦИЯ -->
             <fieldset>
-                <legend>Анимация (только для просмотра)</legend>
+                <legend>Анимация</legend>
                 <div class="controls">
+                    <div class="slider-group">
+                        <label>Скорость анимации <span id="speedVal">2 сек.</span></label>
+                        <input type="range" id="speedSlider" min="0.1" max="5" step="0.1" value="2">
+                    </div>
+
                     <select id="animContinuous">
-                        <option value="none">Без постоянной анимации</option>
-                        <option value="anim-float">🎈 Полет (Левитация)</option>
-                        <option value="anim-breathe">🫁 Дыхание</option>
-                        <option value="anim-pulse">💓 Пульс (Сердцебиение)</option>
-                        <option value="anim-wobble">🥴 Покачивание (Пьяный)</option>
-                        <option value="anim-glitch">⚡ Глитч (Помехи)</option>
+                        <option value="none">🛑 Без постоянной (Статика)</option>
+                        <option value="anim-idle">🧍 Покой (Дыхание)</option>
+                        <option value="anim-float">🎈 Парение</option>
+                        <option value="anim-pulse">💓 Пульс</option>
+                        <option value="anim-shake">🫨 Тряска</option>
+                        <option value="anim-glitch">⚡ Глюк (Glitch)</option>
+                        <option value="anim-spin">🌪️ Вращение</option>
+                        <option value="anim-neon">💡 Неон (Мигание)</option>
+                        <option value="anim-wobble">🥴 Шатание</option>
+                        <option value="anim-swing">🕰️ Качание (Маятник)</option>
+                        <option value="anim-ghost">👻 Призрак (Исчезновение)</option>
                     </select>
 
                     <select id="animHover">
-                        <option value="none">Без анимации при наведении</option>
-                        <option value="hover-zoom">🔍 Увеличение (Zoom)</option>
-                        <option value="hover-tilt">🔄 Наклон вперед</option>
+                        <option value="none">🖱️ Без анимации при наведении</option>
+                        <option value="hover-zoom">🔍 Увеличение</option>
+                        <option value="hover-tilt">🔄 Наклон</option>
                         <option value="hover-squeeze">🥞 Сплющивание</option>
                         <option value="hover-blur">🌫️ Размытие</option>
+                        <option value="hover-jiggle">🐝 Дрожание</option>
                     </select>
 
                     <select id="animClick">
-                        <option value="none">Без анимации по клику</option>
+                        <option value="none">🎯 Без анимации по клику</option>
                         <option value="click-bounce">🦘 Прыжок</option>
-                        <option value="click-spin">🌪️ Вращение 360</option>
-                        <option value="click-squish">🔨 Удар молотком (Сплюснуть)</option>
-                        <option value="click-vanish">💨 Исчезновение</option>
+                        <option value="click-flip">🤸 Переворот 3D</option>
+                        <option value="click-squish">🔨 Удар молотком</option>
+                        <option value="click-damage">🩸 Получение урона (Красный)</option>
+                        <option value="click-vanish">💨 Раствориться (Удаление)</option>
                     </select>
                 </div>
             </fieldset>
         </div>
 
         <div class="buttons-group">
-            <button id="processBtn" disabled>Сгенерировать картинку</button>
-            <button id="downloadBtn">Скачать (WebP сжатие)</button>
+            <button id="processBtn" disabled>Сгенерировать код для Genially</button>
         </div>
     </div>
 
     <!-- ПРАВАЯ КОЛОНКА -->
     <div class="right-panel">
         <div class="preview-box">
-            <span class="placeholder-text" id="placeholder">Загрузите картинку</span>
             <div id="canvasWrapper">
                 <canvas id="canvas"></canvas>
             </div>
+        </div>
+        
+        <!-- МОДАЛЬНОЕ ОКНО КОДА -->
+        <div id="codeModal">
+            <h2 style="color:var(--accent)">Код готов! Скопируйте его:</h2>
+            <p style="text-align:center; font-size: 0.9em; max-width: 80%;">В Genially нажмите <b>Вставить (Insert) -> Другое (Others) -> Встроить код (<>)</b> и вставьте этот текст.</p>
+            <textarea id="outputCode" readonly></textarea>
+            <button class="close-btn" onclick="document.getElementById('codeModal').style.display='none'">Закрыть</button>
         </div>
     </div>
 </div>
@@ -307,25 +261,17 @@
 <script>
     const imageUpload = document.getElementById('imageUpload');
     const fileName = document.getElementById('fileName');
-    const styleSelect = document.getElementById('styleSelect');
-    const flipCheck = document.getElementById('flipCheck');
     const canvas = document.getElementById('canvas');
     const canvasWrapper = document.getElementById('canvasWrapper');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     
-    // Элементы управления
+    // UI Elements
     const processBtn = document.getElementById('processBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const placeholder = document.getElementById('placeholder');
-    
     const brightnessSlider = document.getElementById('brightnessSlider');
-    const opacitySlider = document.getElementById('opacitySlider');
     const glowSlider = document.getElementById('glowSlider');
     const glowColor = document.getElementById('glowColor');
-    
-    const brightVal = document.getElementById('brightVal');
-    const opacityVal = document.getElementById('opacityVal');
-    const glowVal = document.getElementById('glowVal');
+    const speedSlider = document.getElementById('speedSlider');
+    const styleSelect = document.getElementById('styleSelect');
 
     const animContinuous = document.getElementById('animContinuous');
     const animHover = document.getElementById('animHover');
@@ -333,25 +279,23 @@
 
     let originalImage = new Image();
     let isImageLoaded = false;
-    let maxCanvasSize = 1200; // Хорошее разрешение
+    let maxGeniallySize = 800; // Оптимизация для Genially
 
-    // Загрузка картинки
+    // Загрузка
     imageUpload.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            let displayName = file.name.length > 25 ? file.name.substring(0, 22) + '...' : file.name;
-            fileName.textContent = '📁 ' + displayName;
-
+            fileName.textContent = '📁 ' + (file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name);
             const reader = new FileReader();
             reader.onload = function(event) {
                 originalImage.onload = function() {
-                    let scale = Math.min(maxCanvasSize / originalImage.width, maxCanvasSize / originalImage.height, 1);
+                    // Масштабируем, чтобы код не весил мегабайты
+                    let scale = Math.min(maxGeniallySize / originalImage.width, maxGeniallySize / originalImage.height, 1);
                     canvas.width = originalImage.width * scale;
                     canvas.height = originalImage.height * scale;
                     isImageLoaded = true;
-                    placeholder.style.display = 'none';
                     applyStyle();
-                    resetButtons();
+                    processBtn.disabled = false;
                 }
                 originalImage.src = event.target.result;
             }
@@ -359,164 +303,204 @@
         }
     });
 
-    // Обновление интерфейса и рендер
-    const updateInputs = () => {
+    // Реактивность
+    const updateRender = () => {
         if (!isImageLoaded) return;
-        brightVal.textContent = brightnessSlider.value + '%';
-        opacityVal.textContent = opacitySlider.value + '%';
-        glowVal.textContent = glowSlider.value;
+        document.getElementById('brightVal').textContent = brightnessSlider.value + '%';
+        document.getElementById('glowVal').textContent = glowSlider.value;
         applyStyle();
-        resetButtons();
     };
 
-    [styleSelect, flipCheck, brightnessSlider, opacitySlider, glowSlider, glowColor].forEach(el => {
-        el.addEventListener('input', updateInputs);
+    [styleSelect, brightnessSlider, glowSlider, glowColor].forEach(el => el.addEventListener('input', updateRender));
+
+    // Управление скоростью
+    speedSlider.addEventListener('input', () => {
+        document.getElementById('speedVal').textContent = speedSlider.value + ' сек.';
+        document.documentElement.style.setProperty('--anim-speed', speedSlider.value + 's');
     });
 
-    // Применение анимаций
-    const updateAnimations = () => {
-        // Очищаем старые классы
+    // Управление классами анимации (Превью)
+    const updatePreviewAnimations = () => {
         canvasWrapper.className = '';
         canvas.className = '';
-        
-        // Добавляем новые
         if (animContinuous.value !== 'none') canvasWrapper.classList.add(animContinuous.value);
         if (animHover.value !== 'none') canvas.classList.add(animHover.value);
-        if (animClick.value !== 'none') canvas.classList.add(animClick.value);
     };
+    [animContinuous, animHover].forEach(el => el.addEventListener('change', updatePreviewAnimations));
 
-    [animContinuous, animHover, animClick].forEach(el => {
-        el.addEventListener('change', updateAnimations);
-    });
+    // Логика правильного клика в превью (чтобы анимация не прерывалась)
+    canvas.addEventListener('click', () => {
+        if (animClick.value === 'none') return;
+        
+        // Убираем класс, если он уже был (перезапуск)
+        canvas.classList.remove(animClick.value);
+        void canvas.offsetWidth; // Магия для перезапуска CSS анимации
+        canvas.classList.add(animClick.value);
 
-    // Пресеты при смене стиля
-    styleSelect.addEventListener('change', () => {
-        const s = styleSelect.value;
-        if(s === 'cyberpunk') { glowColor.value = '#ff00ff'; glowSlider.value = 25; brightnessSlider.value = 110;}
-        else if(s === 'ghost') { glowColor.value = '#00ffff'; glowSlider.value = 20; opacitySlider.value = 60;}
-        else if(s === 'hologram') { glowColor.value = '#0088ff'; glowSlider.value = 15; opacitySlider.value = 80;}
-        else if(s === 'gold') { glowColor.value = '#ffd700'; glowSlider.value = 10; brightnessSlider.value = 120; opacitySlider.value = 100;}
-        else if(s === 'acid') { glowColor.value = '#39ff14'; glowSlider.value = 30; brightnessSlider.value = 150; opacitySlider.value = 100;}
-        else if(s === 'ice') { glowColor.value = '#a5f2f3'; glowSlider.value = 25; brightnessSlider.value = 130; opacitySlider.value = 90;}
-        else if(s === 'thermal') { glowColor.value = '#ff0000'; glowSlider.value = 10;}
-        else { glowSlider.value = 0; brightnessSlider.value = 100; opacitySlider.value = 100; }
-        updateInputs();
-    });
-
-    function resetButtons() {
-        processBtn.textContent = 'Сгенерировать картинку';
-        processBtn.disabled = false;
-        downloadBtn.style.display = 'none';
-    }
-
-    processBtn.addEventListener('click', function() {
-        if (!isImageLoaded) return;
-        processBtn.textContent = 'Обработка пикселей... ⚡';
-        processBtn.disabled = true;
+        // Длительность зависит от типа (damage, bounce быстрые)
+        let dur = 500;
+        if(animClick.value === 'click-vanish') dur = 600;
+        
         setTimeout(() => {
-            processBtn.textContent = '✨ Готово к скачиванию';
-            downloadBtn.style.display = 'block';
-        }, 600);
+            canvas.classList.remove(animClick.value);
+        }, dur);
     });
 
-    // МАТЕМАТИКА ОТРИСОВКИ
+    // Отрисовка стилей на Canvas
     function applyStyle() {
-        if (!isImageLoaded) return;
-
         const style = styleSelect.value;
         const brightness = brightnessSlider.value;
-        const opacity = opacitySlider.value / 100;
         const glowV = glowSlider.value;
         const glowC = glowColor.value;
-        const isFlipped = flipCheck.checked;
 
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
-        const tempCtx = tempCanvas.getContext('2d');
+        const tempC = document.createElement('canvas');
+        tempC.width = canvas.width; tempC.height = canvas.height;
+        const tempCtx = tempC.getContext('2d');
 
-        // Поворот по горизонтали
-        if (isFlipped) {
-            tempCtx.translate(canvas.width, 0);
-            tempCtx.scale(-1, 1);
-        }
-
-        // Фильтры
-        let filterStr = `brightness(${brightness}%)`;
+        let filter = `brightness(${brightness}%)`;
+        if (style === 'cyberpunk') filter += ` saturate(300%) hue-rotate(90deg) contrast(150%)`;
+        if (style === 'thermal') filter += ` invert(100%) hue-rotate(180deg) saturate(500%) contrast(200%)`;
+        if (style === 'gold') filter += ` sepia(100%) contrast(150%) saturate(200%) hue-rotate(15deg)`;
+        if (style === 'stone') filter += ` grayscale(100%) contrast(80%) brightness(80%)`;
         
-        if (style === 'sketch') filterStr += ` grayscale(100%) contrast(200%)`;
-        if (style === 'cyberpunk') filterStr += ` saturate(300%) hue-rotate(90deg) contrast(150%) invert(10%)`;
-        if (style === 'ghost') filterStr += ` invert(80%) grayscale(50%) hue-rotate(180deg) blur(1px)`;
-        if (style === 'hologram') filterStr += ` sepia(100%) hue-rotate(180deg) saturate(300%) contrast(150%)`;
-        if (style === 'thermal') filterStr += ` invert(100%) hue-rotate(180deg) saturate(500%) contrast(200%)`;
-        if (style === 'acid') filterStr += ` saturate(500%) hue-rotate(270deg) contrast(200%) invert(20%)`;
-        if (style === 'gold') filterStr += ` sepia(100%) contrast(150%) saturate(200%) hue-rotate(15deg) drop-shadow(2px 4px 6px black)`;
-        if (style === 'ice') filterStr += ` sepia(100%) hue-rotate(180deg) saturate(100%) contrast(120%) brightness(150%)`;
-        if (style === 'crt') filterStr += ` saturate(200%) contrast(150%) blur(0.5px)`;
-
-        tempCtx.filter = filterStr;
-        tempCtx.globalAlpha = opacity;
+        tempCtx.filter = filter;
         tempCtx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
-        tempCtx.globalAlpha = 1.0; 
         tempCtx.filter = 'none';
 
-        // Эффекты пикселизации и наложения
         if (style === 'pixel') {
-            let pSize = 4;
-            const w = Math.ceil(canvas.width / pSize);
-            const h = Math.ceil(canvas.height / pSize);
-            const tinyC = document.createElement('canvas');
-            tinyC.width = w; tinyC.height = h;
-            tinyC.getContext('2d').drawImage(tempCanvas, 0, 0, w, h);
-            
-            tempCtx.clearRect(0, 0, canvas.width, canvas.height);
+            let pSize = 5;
+            let w = Math.ceil(canvas.width / pSize), h = Math.ceil(canvas.height / pSize);
+            let tiny = document.createElement('canvas');
+            tiny.width = w; tiny.height = h;
+            tiny.getContext('2d').drawImage(tempC, 0, 0, w, h);
+            tempCtx.clearRect(0,0, canvas.width, canvas.height);
             tempCtx.imageSmoothingEnabled = false;
-            tempCtx.drawImage(tinyC, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
-        } 
-        else if (style === 'silhouette') {
+            tempCtx.drawImage(tiny, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
+        } else if (style === 'silhouette') {
             tempCtx.globalCompositeOperation = 'source-in';
-            tempCtx.fillStyle = '#050505';
+            tempCtx.fillStyle = '#000';
             tempCtx.fillRect(0, 0, canvas.width, canvas.height);
             tempCtx.globalCompositeOperation = 'source-over';
-        } 
-        else if (style === 'hologram' || style === 'crt') {
+        } else if (style === 'hologram') {
             tempCtx.globalCompositeOperation = 'source-atop';
-            tempCtx.fillStyle = style === 'hologram' ? 'rgba(0, 255, 255, 0.15)' : 'rgba(0,0,0,0.3)';
-            let step = style === 'hologram' ? 4 : 3;
-            for(let y = 0; y < canvas.height; y += step) {
-                tempCtx.fillRect(0, y, canvas.width, 1.5);
-            }
-            if (style === 'crt') {
-                // Добавляем RGB смещение для CRT
-                tempCtx.globalCompositeOperation = 'screen';
-                tempCtx.fillStyle = 'rgba(255,0,0,0.1)';
-                tempCtx.fillRect(2, 0, canvas.width, canvas.height);
-                tempCtx.fillStyle = 'rgba(0,0,255,0.1)';
-                tempCtx.fillRect(-2, 0, canvas.width, canvas.height);
-            }
+            tempCtx.fillStyle = 'rgba(0, 229, 255, 0.2)';
+            for(let y = 0; y < canvas.height; y += 4) tempCtx.fillRect(0, y, canvas.width, 2);
             tempCtx.globalCompositeOperation = 'source-over';
         }
 
-        // Финальный рендер со свечением
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.shadowColor = glowV > 0 ? glowC : 'transparent';
         ctx.shadowBlur = parseInt(glowV);
         ctx.imageSmoothingEnabled = true;
-
-        // Если было отражение, возвращаем холст в норм состояние, так как мы уже отзеркалили tempCanvas
-        ctx.setTransform(1, 0, 0, 1, 0, 0); 
-        ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(tempC, 0, 0, canvas.width, canvas.height);
     }
 
-    // Скачивание файла со СЖАТИЕМ (WEBP)
-    downloadBtn.addEventListener('click', function() {
-        const link = document.createElement('a');
-        link.download = 'magic_character.webp'; 
-        // Используем формат image/webp с качеством 0.8 (80%) для сильного сжатия при сохранении прозрачности
-        link.href = canvas.toDataURL('image/webp', 0.8);
-        link.click();
-    });
-</script>
+    // ГЕНЕРАЦИЯ КОДА ДЛЯ GENIALLY
+    processBtn.addEventListener('click', function() {
+        if (!isImageLoaded) return;
+        
+        // Переводим канвас в легкий webp формат base64
+        const base64Image = canvas.toDataURL('image/webp', 0.85);
+        
+        const cont = animContinuous.value;
+        const hov = animHover.value;
+        const clk = animClick.value;
+        const speed = speedSlider.value + 's';
 
+        // Собираем ВСЕ ключевые кадры и классы, чтобы внедрить их внутрь iFrame
+        const stylesBlock = `
+        <style>
+            body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; background: transparent; }
+            #wrapper { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
+            img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: pointer; transition: transform 0.3s ease, filter 0.3s ease; }
+            
+            :root { --anim-speed: ${speed}; }
+            
+            /* Continuous */
+            .anim-idle { animation: idle var(--anim-speed) ease-in-out infinite; }
+            .anim-float { animation: float var(--anim-speed) ease-in-out infinite; }
+            .anim-pulse { animation: pulse var(--anim-speed) infinite; }
+            .anim-shake { animation: shake calc(var(--anim-speed) / 5) infinite; }
+            .anim-glitch { animation: glitch calc(var(--anim-speed) / 4) infinite linear; }
+            .anim-spin { animation: spin var(--anim-speed) linear infinite; }
+            .anim-neon { animation: neon var(--anim-speed) alternate infinite; }
+            .anim-wobble { animation: wobble var(--anim-speed) ease-in-out infinite; }
+            .anim-swing { animation: swing var(--anim-speed) ease-in-out infinite; }
+            .anim-ghost { animation: ghost var(--anim-speed) infinite; }
+
+            /* Hover */
+            .hover-zoom:hover { transform: scale(1.15) !important; }
+            .hover-tilt:hover { transform: rotate(15deg) scale(1.05) !important; }
+            .hover-squeeze:hover { transform: scaleY(0.8) scaleX(1.2) !important; }
+            .hover-blur:hover { filter: blur(5px); }
+            .hover-jiggle:hover { animation: shake 0.2s infinite; }
+
+            /* Click (JS controlled) */
+            .click-bounce { animation: bounce 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) forwards !important; }
+            .click-flip { animation: flip 0.6s ease forwards !important; }
+            .click-squish { animation: squish 0.3s ease forwards !important; }
+            .click-damage { animation: damage 0.4s ease forwards !important; }
+            .click-vanish { animation: vanish 0.6s forwards !important; }
+
+            /* Keyframes */
+            @keyframes idle { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.03) scaleX(0.98); } }
+            @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+            @keyframes pulse { 0% { transform: scale(1); filter: brightness(100%);} 50% { transform: scale(1.05); filter: brightness(130%); } 100% { transform: scale(1); filter: brightness(100%); } }
+            @keyframes shake { 0%, 100% { transform: translate(0,0) rotate(0); } 25% { transform: translate(-3px, 2px) rotate(-2deg); } 50% { transform: translate(3px, -2px) rotate(2deg); } 75% { transform: translate(-3px, -2px) rotate(-1deg); } }
+            @keyframes glitch { 0% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 2px); } 20% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); } 40% { clip-path: inset(40% 0 40% 0); transform: translate(-2px, 2px); } 60% { clip-path: inset(10% 0 60% 0); transform: translate(2px, 2px); } 80% { clip-path: inset(50% 0 30% 0); transform: translate(-2px, -2px); } 100% { clip-path: inset(0 0 0 0); transform: translate(0); } }
+            @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+            @keyframes neon { 0% { filter: drop-shadow(0 0 5px #00e5ff) brightness(100%); } 100% { filter: drop-shadow(0 0 25px #00e5ff) brightness(150%); } }
+            @keyframes wobble { 0%, 100% { transform: translateX(0%) rotate(0deg); } 15% { transform: translateX(-15px) rotate(-5deg); } 30% { transform: translateX(10px) rotate(3deg); } 45% { transform: translateX(-10px) rotate(-3deg); } 60% { transform: translateX(5px) rotate(2deg); } 75% { transform: translateX(-5px) rotate(-1deg); } }
+            @keyframes swing { 20% { transform: rotate3d(0, 0, 1, 15deg); } 40% { transform: rotate3d(0, 0, 1, -10deg); } 60% { transform: rotate3d(0, 0, 1, 5deg); } 80% { transform: rotate3d(0, 0, 1, -5deg); } to { transform: rotate3d(0, 0, 1, 0deg); } }
+            @keyframes ghost { 0%, 100% { opacity: 1; filter: blur(0px); } 50% { opacity: 0.3; filter: blur(3px); transform: scale(1.05); } }
+            @keyframes bounce { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-40px) scaleY(1.1); } 70% { transform: translateY(0) scaleY(0.9); } }
+            @keyframes flip { 0% { transform: perspective(400px) rotateY(0); } 100% { transform: perspective(400px) rotateY(360deg); } }
+            @keyframes squish { 0%, 100% { transform: scale(1,1); } 50% { transform: scale(1.5, 0.5) translateY(20px); } }
+            @keyframes damage { 0%, 100% { filter: brightness(100%); transform: translateX(0); } 20% { filter: brightness(200%) hue-rotate(-50deg) saturate(300%); transform: translateX(-10px); } 40% { transform: translateX(10px); } 60% { transform: translateX(-10px); } }
+            @keyframes vanish { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(2) translateY(-20px); filter: blur(10px); } }
+        </style>
+        `;
+
+        // Скрипт для обработки клика внутри iframe
+        const jsBlock = `
+        <script>
+            const img = document.getElementById('char');
+            const clickAnim = '${clk}';
+            if(clickAnim !== 'none') {
+                img.addEventListener('click', () => {
+                    img.classList.remove(clickAnim);
+                    void img.offsetWidth;
+                    img.classList.add(clickAnim);
+                    setTimeout(() => { img.classList.remove(clickAnim); }, 600);
+                });
+            }
+        <\/script>
+        `;
+
+        // Формируем чистый HTML
+        const htmlContent = `
+            <!DOCTYPE html><html><head>${stylesBlock}</head>
+            <body>
+                <div id="wrapper" class="${cont !== 'none' ? cont : ''}">
+                    <img id="char" src="${base64Image}" class="${hov !== 'none' ? hov : ''}" />
+                </div>
+                ${jsBlock}
+            </body></html>
+        `;
+
+        // Кодируем HTML в URL и создаем iframe
+        const encodedHtml = encodeURIComponent(htmlContent);
+        const iframeCode = `<iframe src="data:text/html;charset=utf-8,${encodedHtml}" width="100%" height="100%" style="border:none; background:transparent;" allowtransparency="true"></iframe>`;
+
+        // Показываем модальное окно
+        const outputArea = document.getElementById('outputCode');
+        outputArea.value = iframeCode;
+        document.getElementById('codeModal').style.display = 'flex';
+        
+        // Автоматически выделяем текст для удобства
+        outputArea.select();
+    });
+
+</script>
 </body>
 </html>
