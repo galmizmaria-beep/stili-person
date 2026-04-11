@@ -633,7 +633,8 @@
             if(glowV > 0) imgCssFilter += `drop-shadow(0 0 ${glowV}px ${glowC}) `;
 
             let scriptBlock = "";
-            let clickLogic = "";
+            let clickLogic = "e.stopPropagation(); "; // ЗАПРЕТИТЬ ПЕРЕХОД ДЛЯ GENIALLY
+            
             if(clk !== 'none') {
                 let animName = clk.replace('click-', '');
                 let t = "0.5s ease forwards";
@@ -642,13 +643,13 @@
                 if(animName === 'vanish') t = "0.5s forwards";
                 if(animName === 'flip') t = "0.6s forwards";
                 if(animName === 'glitch') t = "0.3s linear infinite";
-                clickLogic = `this.style.animation = 'none'; void this.offsetWidth; this.style.animation = '${animName} ${t}'; setTimeout(() => { this.style.animation = ''; }, 1000);`;
+                clickLogic += `this.style.animation = 'none'; void this.offsetWidth; this.style.animation = '${animName} ${t}'; setTimeout(() => { this.style.animation = ''; }, 1000); `;
             }
+            
             if(audioStr !== '') clickLogic += `new Audio('${audioStr}').play();`;
 
-            if(clickLogic !== '') {
-                scriptBlock = `\n<script>document.getElementById('g-img').addEventListener('click', function() { ${clickLogic} });<\/script>`;
-            }
+            // Скрипт теперь всегда добавляется, чтобы предотвратить переход на следующий слайд при клике
+            scriptBlock = `\n<script>document.getElementById('g-img').addEventListener('click', function(e) { ${clickLogic} });<\/script>`;
 
             let shadowHTML = els.shadowCheck.checked ? '<div class="g-shadow"></div>' : '';
             
@@ -670,17 +671,17 @@
 
             let tooltipHTML = tooltip ? `<div class="g-tt">${tooltip}</div>` : '';
 
-            // ФИНАЛЬНЫЙ HTML КОД. Убрано pointer-events: none, чтобы Genially не блокировался.
+            // ФИНАЛЬНЫЙ HTML КОД (добавлен pointer-events: none на фон и pointer-events: auto на саму картинку)
             const geniallyCode = `<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <style>
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; font-family: sans-serif;}
-  .g-cont { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; position: relative; --anim-speed: ${speed}s; }
-  .g-wrap { position: relative; display: inline-flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; font-family: sans-serif; pointer-events: none;}
+  .g-cont { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; position: relative; --anim-speed: ${speed}s; pointer-events: none;}
+  .g-wrap { position: relative; display: inline-flex; justify-content: center; align-items: center; width: 100%; height: 100%; pointer-events: none;}
   
-  #g-img { width: 100%; height: 100%; object-fit: contain; cursor: pointer; transition: 0.3s ease; display: block; position: relative; z-index: 5; filter: ${imgCssFilter || 'none'}; }
+  #g-img { width: 100%; height: 100%; object-fit: contain; cursor: pointer; transition: 0.3s ease; display: block; position: relative; z-index: 5; filter: ${imgCssFilter || 'none'}; pointer-events: auto;}
   
   .g-shadow { position: absolute; bottom: 5%; width: 50%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, transparent 70%); border-radius: 50%; z-index: 1; pointer-events: none; }
   
