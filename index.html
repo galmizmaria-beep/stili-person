@@ -105,302 +105,7 @@
 
         #canvasWrapper { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; transition: all 0.3s ease; }
         
-        canvas { max-width: 90%; max-height: 80%; object-fit: contain; transition: all 0.3s ease; cursor: pointer; position: relative; z-index: 5; filter: var(--base-filter);}
-        
-        .placeholder-text { position: absolute; color: #666; background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 10px; font-size: 0.9em; z-index: 10;}
-
-        /* ДОП ЭФФЕКТЫ ПРЕВЬЮ */
-        .preview-shadow { position: absolute; bottom: 5%; width: 50%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; display: none; z-index: 1;}
-        .preview-tooltip { position: absolute; top: 10%; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; font-weight: bold; pointer-events: none; opacity: 0; transition: 0.3s; z-index: 10; transform: translateY(10px); text-align: center;}
-        canvas:hover ~ .preview-tooltip.active { opacity: 1; transform: translateY(0); }
-        
-        /* СТИЛИ ПРЕВЬЮ КВЕСТОВ */
-        #previewQuestBox {
-            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 20; padding: 15px; border-radius: 8px; width: 280px; text-align: left; display: none; box-sizing: border-box;
-        }
-        .quest-title { font-weight: bold; margin-bottom: 8px; text-align: center;}
-        
-        .quest-desc { line-height: 1.4; word-wrap: break-word; max-height: 250px; overflow-y: auto; padding-right: 5px;}
-        .quest-desc::-webkit-scrollbar { width: 4px; }
-        .quest-desc::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
-        
-        .quest-btn { margin-top: 10px; padding: 8px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; width: 100%; pointer-events: none; transition: 0.3s;}
-        
-        /* Базовые стили */
-        .quest-fantasy { border: 2px solid; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-        .quest-fantasy .quest-title { border-bottom: 1px solid; padding-bottom: 5px; }
-        
-        .quest-cyberpunk { border: 1px solid; box-shadow: 0 0 10px #0ff; text-transform: uppercase; letter-spacing: 1px; border-radius: 0 !important;}
-        .quest-cyberpunk .quest-title { border-bottom: 1px dashed; padding-bottom: 5px; text-shadow: 0 0 5px #0ff; }
-        .quest-cyberpunk .quest-btn { box-shadow: 0 0 5px #0ff; border-radius: 0 !important; }
-        
-        .quest-rpg { border: 2px solid; box-shadow: inset 0 0 10px #000; border-radius: 0 !important;}
-        .quest-rpg .quest-title { border-bottom: 2px solid; padding-bottom: 5px; }
-        .quest-rpg .quest-btn { border: 1px solid; }
-
-        /* ЧАСТИЦЫ */
-        .particles-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; overflow: hidden; display: none;}
-        .particle { position: absolute; border-radius: 50%; animation: floatUp linear infinite; opacity: 0; }
-        @keyframes floatUp { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }
-
-        /* АНИМАЦИИ */
-        .anim-float { animation: float var(--anim-speed) ease-in-out infinite; }
-        .anim-pulse { animation: pulse calc(var(--anim-speed) / 1.5) infinite; }
-        .anim-breathe { animation: breathe var(--anim-speed) ease-in-out infinite; }
-        .anim-wobble { animation: wobble var(--anim-speed) ease-in-out infinite; }
-        .anim-glitch { animation: glitch calc(var(--anim-speed) / 6) linear infinite; }
-        .anim-spin { animation: spin var(--anim-speed) linear infinite; }
-        .anim-neon { animation: neon calc(var(--anim-speed) / 1.5) alternate infinite; }
-        .anim-swing { animation: swing var(--anim-speed) ease-in-out infinite; transform-origin: top center; }
-        .anim-shake { animation: shake calc(var(--anim-speed) / 4) infinite; }
-        .anim-ghost { animation: ghost var(--anim-speed) infinite alternate; }
-
-        .hover-zoom:hover { transform: scale(1.15) !important; }
-        .hover-blur:hover { filter: var(--base-filter) blur(5px) !important; }
-        .hover-tilt:hover { transform: rotate(15deg) scale(1.05) !important; }
-        .hover-squeeze:hover { transform: scaleY(0.8) scaleX(1.2) !important; }
-        .hover-neon:hover { animation: neon calc(var(--anim-speed) / 2) alternate infinite; }
-        .hover-shake:hover { animation: shake 0.3s infinite; }
-
-        .click-bounce-trigger { animation: bounce 0.5s ease forwards !important; }
-        .click-spin-trigger { animation: spin 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards !important; }
-        .click-squish-trigger { animation: squish 0.3s forwards !important; }
-        .click-vanish-trigger { animation: vanish 0.5s forwards !important; }
-        .click-flip-trigger { animation: flip 0.6s forwards !important; }
-        .click-glitch-trigger { animation: glitch 0.3s linear infinite !important; }
-
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); filter: var(--base-filter) brightness(130%); } 100% { transform: scale(1); } }
-        @keyframes breathe { 0%, 100% { transform: scaleY(1) scaleX(1); } 50% { transform: scaleY(1.05) scaleX(0.98); } }
-        @keyframes wobble { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
-        @keyframes glitch { 0% { transform: translate(0) } 20% { transform: translate(-3px, 3px) } 40% { transform: translate(-3px, -3px) } 60% { transform: translate(3px, 3px) } 80% { transform: translate(3px, -3px) } 100% { transform: translate(0) } }
-        @keyframes bounce { 0% { transform: translateY(0); } 40% { transform: translateY(-60px) scaleY(1.1); } 100% { transform: translateY(0) scaleY(1); } }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes neon { 0% { filter: var(--base-filter) drop-shadow(0 0 5px var(--gold)); } 100% { filter: var(--base-filter) drop-shadow(0 0 20px var(--gold)); } }
-        @keyframes swing { 20% { transform: rotate(15deg); } 40% { transform: rotate(-10deg); } 60% { transform: rotate(5deg); } 80% { transform: rotate(-5deg); } 100% { transform: rotate(0deg); } }
-        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
-        @keyframes ghost { 0% { opacity: 1; filter: var(--base-filter) grayscale(0%);} 100% { opacity: 0.3; filter: var(--base-filter) grayscale(80%) blur(2px);} }
-        @keyframes squish { 0%, 100% { transform: scale(1); } 50% { transform: scaleY(0.4) scaleX(1.5) translateY(30%); } }
-        @keyframes vanish { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(2); } }
-        @keyframes flip { 0% { transform: perspective(400px) rotateY(0deg); } 100% { transform: perspective(400px) rotateY(360deg); } }
-        
-        .divider { height: 1px; background: #444; margin: 10px 0; }
-    </style>
-</head>
-<body>
-
-<div class="editor-container">
-    <div class="left-panel">
-        <div>
-            <h1>Редактор персонажа PRO</h1>
-            <p class="subtitle">Настрой визуал, эффекты и интерактивы для игры</p>
-
-            <!-- БЛОК: ЗАГРУЗКА -->
-            <div class="upload-tabs">
-                <button class="tab-btn active" onclick="switchTab('file')">📁 Файл с ПК</button>
-                <button class="tab-btn" onclick="switchTab('url')">🔗 Ссылка (URL)</button>
-            </div>
-            
-            <div id="tab-file" class="upload-section active">
-                <label class="custom-file-upload">
-                    <input type="file" id="imageUpload" accept="image/png, image/jpeg, image/webp">
-                    <span id="fileName">Нажми, чтобы загрузить картинку без фона</span>
-                </label>
-            </div>
-            <div id="tab-url" class="upload-section">
-                <input type="text" id="imageUrl" class="text-input" placeholder="Вставь прямую ссылку на картинку (https://...)" style="margin-bottom:15px;">
-            </div>
-
-            <!-- БЛОК: ВНЕШНИЙ ВИД -->
-            <fieldset>
-                <legend>Внешний вид и Окружение</legend>
-                <div class="controls">
-                    <select id="styleSelect">
-                        <option value="none">Оригинал (Без стиля)</option>
-                        <option value="pixel">👾 8-bit Пиксель-арт</option>
-                        <option value="sketch">✏️ Карандашный скетч</option>
-                        <option value="cyberpunk">🌃 Киберпанк-неон</option>
-                        <option value="hologram">💿 Голограмма</option>
-                        <option value="silhouette">🥷 Силуэт ниндзя</option>
-                        <option value="ghost">👻 Призрак</option>
-                    </select>
-
-                    <select id="toningSelect">
-                        <option value="none">🎨 Без цветового статуса</option>
-                        <option value="poison">🤢 Отравлен (Зеленый)</option>
-                        <option value="fire">🔥 В огне (Оранжевый)</option>
-                        <option value="freeze">❄️ Заморожен (Синий)</option>
-                        <option value="rage">💢 Ярость (Красный)</option>
-                        <option value="stone">🪨 Окаменение (Серый)</option>
-                    </select>
-
-                    <label class="checkbox-group"><input type="checkbox" id="flipCheck"> 🔄 Отразить по горизонтали</label>
-
-                    <div class="slider-group">
-                        <label>Прозрачность <span id="opacityVal">100%</span></label>
-                        <input type="range" id="opacitySlider" min="10" max="100" value="100">
-                    </div>
-                    <div class="slider-group">
-                        <label>Яркость <span id="brightVal">100%</span></label>
-                        <input type="range" id="brightnessSlider" min="10" max="250" value="100">
-                    </div>
-
-                    <div class="divider"></div>
-
-                    <div class="slider-group">
-                        <label>Магическое свечение <span id="glowVal">0</span></label>
-                        <input type="range" id="glowSlider" min="0" max="80" value="0">
-                    </div>
-                    
-                    <div class="color-group" style="margin-bottom: 5px;">
-                        <label class="checkbox-group"><input type="checkbox" id="outlineCheck"> Обводка контура</label>
-                        <input type="color" id="outlineColor" value="#ffffff">
-                    </div>
-
-                    <div class="color-group">
-                        <label>Цвет эффектов (Свечение/Частицы):</label>
-                        <input type="color" id="glowColor" value="#dfb23e">
-                    </div>
-
-                    <label class="checkbox-group"><input type="checkbox" id="shadowCheck"> 🕳️ Тень на полу</label>
-
-                    <select id="particlesSelect">
-                        <option value="none">Без фоновых частиц</option>
-                        <option value="sparks">✨ Искры магии</option>
-                        <option value="snow">🌨️ Снежинки</option>
-                        <option value="bubbles">🫧 Пузырьки</option>
-                        <option value="pixels">🔲 Пиксельный мусор</option>
-                    </select>
-                </div>
-            </fieldset>
-
-            <!-- БЛОК: ТЕКСТ И ТУЛТИП -->
-            <fieldset>
-                <legend>Текст и Имя персонажа (Тултип)</legend>
-                <div class="controls">
-                    <select id="globalFont">
-                        <option value="'Montserrat', sans-serif">Montserrat (Современный)</option>
-                        <option value="'Roboto', sans-serif">Roboto (Универсальный)</option>
-                        <option value="'Cormorant Garamond', serif">Cormorant (Фэнтези/Книги)</option>
-                        <option value="'Cinzel', serif">Cinzel (Эпичный/RPG)</option>
-                        <option value="'Oswald', sans-serif">Oswald (Узкий/Киберпанк)</option>
-                        <option value="'Courier Prime', monospace">Courier (Печатная машинка)</option>
-                        <option value="'Comic Neue', cursive">Comic Neue (Комикс/Казуальный)</option>
-                        <option value="'Playfair Display', serif">Playfair (Элегантный)</option>
-                        <option value="Impact, sans-serif">Impact (Мемный/Жирный)</option>
-                    </select>
-                    
-                    <div class="slider-group">
-                        <label>Размер текста <span id="fontVal">14px</span></label>
-                        <input type="range" id="fontSizeSlider" min="10" max="26" value="14">
-                    </div>
-
-                    <input type="text" id="tooltipInput" class="text-input" placeholder="💬 Всплывающее имя (напр: Гоблин 100HP)">
-                    
-                    <div class="color-group">
-                        <label>Цвет текста имени:</label>
-                        <input type="color" id="ttTextColor" value="#dfb23e">
-                    </div>
-                    <div class="color-group">
-                        <label>Цвет плашки (фона):</label>
-                        <input type="color" id="ttBgColor" value="#000000">
-                    </div>
-                    <div class="slider-group">
-                        <label>Прозрачность плашки имени <span id="ttOpVal">80%</span></label>
-                        <input type="range" id="ttBgOpacity" min="0" max="100" value="80">
-                    </div>
-                </div>
-            </fieldset>
-
-            <!-- БЛОК: ЗАДАНИЯ И КВЕСТЫ -->
-            <fieldset>
-                <legend>Задания и Диалоги</legend>
-                <div class="controls">
-                    <input type="text" id="questTitle" class="text-input" placeholder="📜 Заголовок (напр: Секрет гоблина)">
-                    <textarea id="questText" class="text-input" placeholder="Текст задания... Можно писать очень длинный текст, появится скролл." style="resize: vertical; min-height: 80px;"></textarea>
-                    
-                    <select id="questTrigger">
-                        <option value="hover">👀 Показывать окно ПРИ НАВЕДЕНИИ</option>
-                        <option value="click">🖱️ Открывать окно ПО КЛИКУ</option>
-                    </select>
-
-                    <select id="questStyle">
-                        <option value="fantasy">📜 Фэнтези (Свиток)</option>
-                        <option value="cyberpunk">💻 Киберпанк (Неон)</option>
-                        <option value="rpg">🪨 RPG Classic (Золото)</option>
-                    </select>
-
-                    <div class="color-group">
-                        <label>Цвет текста окна:</label>
-                        <input type="color" id="qTextColor" value="#e0e0e0">
-                    </div>
-                    <div class="color-group">
-                        <label>Цвет фона окна:</label>
-                        <input type="color" id="qBgColor" value="#1e1e1e">
-                    </div>
-                    <div class="slider-group">
-                        <label>Прозрачность окна <span id="qOpVal">95%</span></label>
-                        <input type="range" id="qBgOpacity" min="10" max="100" value="95">
-                    </div>
-                    
-                    <div class="divider"></div>
-                    
-                    <div class="color-group">
-                        <label>Цвет рамки окна:</label>
-                        <input type="color" id="qBorderColor" value="#dfb23e">
-                    </div>
-                    <div class="color-group">
-                        <label>Цвет линии-разделителя:</label>
-                        <input type="color" id="qDividerColor" value="#dfb23e">
-                    </div>
-                    <div class="color-group" id="btnColorGroup" style="display: none;">
-                        <label>Цвет кнопки (Фон / Текст):</label>
-                        <div style="display: flex; gap: 5px;">
-                            <input type="color" id="qBtnBgColor" value="#dfb23e" title="Цвет фона кнопки">
-                            <input type="color" id="qBtnTextColor" value="#000000" title="Цвет текста кнопки">
-                        </div>
-                    </div>
-                </div>
-            </fieldset>
-
-            <!-- БЛОК: АНИМАЦИИ И ИНТЕРАКТИВ -->
-            <fieldset>
-                <legend>Анимации (Поведение)</legend>
-                <div class="controls">
-                    <div class="slider-group">
-                        <label>Скорость анимаций <span id="speedVal">Нормальная</span></label>
-                        <input type="range" id="animSpeed" min="0.2" max="4" step="0.1" value="2" dir="rtl">
-                    </div>
-
-                    <select id="animContinuous">
-                        <option value="none">Покой (Без фоновой анимации)</option>
-                        <option value="anim-float">🎈 Парение (Полет)</option>
-                        <option value="anim-pulse">💓 Пульс (Сердцебиение)</option>
-                        <option value="anim-shake">🫨 Тряска (Землетрясение)</option>
-                        <option value="anim-glitch">⚡ Глюк (Системная ошибка)</option>
-                        <option value="anim-spin">🌪️ Вращение (Водоворот)</option>
-                        <option value="anim-neon">🌟 Неон (Сияние)</option>
-                        <option value="anim-wobble">🥴 Шатание (Оглушение)</option>
-                        <option value="anim-swing">🕰️ Качание (Маятник)</option>
-                        <option value="anim-breathe">🫁 Дыхание (AFK)</option>
-                        <option value="anim-ghost">👻 Призрак (Мерцание)</option>
-                    </select>
-
-                    <select id="animHover">
-                        <option value="none">Без реакции на наведение</option>
-                        <option value="hover-zoom">🔍 Увеличение (Zoom)</option>
-                        <option value="hover-tilt">🔄 Наклон вперед</option>
-                        <option value="hover-squeeze">🥞 Сплющивание</option>
-                        <option value="hover-blur">🌫️ Размытие (Скрытность)</option>
-                        <option value="hover-neon">✨ Магический отклик (Неон)</option>
-                        <option value="hover-shake">💥 Дрожь (Агро)</option>
-                    </select>
-
-                    <select id="animClick">
-                        <option value="none">Без внутренней анимации по клику</option>
-                        <option value="click-bounce">🦘 Прыжок (Уклонение)</option>
-                        <option value="click-spin">🔄 Сальто 360 (Перекат)</option>
-                        <option value="click-squish">🔨 Удар молотком (Стан)</option>
+        canvas { max-width: 90%; max-height: 80%; object-fit: contain; transition: all 0.3s ease; cursor: pointer; position: relative>
                         <option value="click-flip">🎭 Переворот (Смена стойки)</option>
                         <option value="click-vanish">💨 Исчезновение (ТП)</option>
                         <option value="click-glitch">💻 Критический сбой</option>
@@ -619,7 +324,7 @@
             let qTitleEl = els.previewQuestBox.querySelector('.quest-title');
             if(qTitleEl) {
                 qTitleEl.style.borderBottomColor = els.qDividerColor.value;
-                qTitleEl.style.fontSize = (parseInt(fSize) + 2) + 'px'; // Заголовок чуть больше
+                qTitleEl.style.fontSize = (parseInt(fSize) + 2) + 'px'; 
             }
             
             let qDescEl = els.previewQuestBox.querySelector('.quest-desc');
@@ -855,21 +560,21 @@
                 questHTML = `<div id="q-box" class="q-box q-${qStyle}"><div class="q-title">${qTitle}</div><div class="q-desc">${qText}</div>${btnHTML}</div>`;
                 
                 questCSS += `
-                .q-box { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.9); z-index: 20; padding: 15px; border-radius: 8px; width: 280px; text-align: left; opacity: 0; pointer-events: none; transition: 0.3s; font-family: ${fontFam}; box-sizing: border-box; display: none; color: ${qTCol}; background: ${qBg}; border-color: ${qBorder} !important; font-size: ${fSize}px; }
-                .q-title { font-weight: bold; margin-bottom: 8px; text-align: center; border-bottom-color: ${qDivider} !important; font-size: ${parseInt(fSize) + 2}px;}
-                .q-desc { line-height: 1.4; word-wrap: break-word; max-height: 250px; overflow-y: auto; padding-right:5px;}
+                .q-box { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.9); z-index: 20; padding: 20px 25px; border-radius: 8px; width: 300px; text-align: left; opacity: 0; pointer-events: none; transition: 0.3s; font-family: ${fontFam}; box-sizing: border-box; display: none; color: ${qTCol}; background: ${qBg}; border-color: ${qBorder} !important; font-size: ${fSize}px; }
+                .q-title { font-weight: bold; margin-bottom: 15px; text-align: center; border-bottom-color: ${qDivider} !important; font-size: ${parseInt(fSize) + 2}px; padding-bottom: 10px !important;}
+                .q-desc { line-height: 1.5; word-wrap: break-word; max-height: 250px; overflow-y: auto; padding-right: 12px;}
                 .q-desc::-webkit-scrollbar { width: 4px; } .q-desc::-webkit-scrollbar-thumb { background: ${qTCol}; border-radius: 4px; }
-                .q-btn { margin-top: 10px; padding: 8px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; width: 100%; transition: 0.3s; background: ${qBtnBg} !important; color: ${qBtnText} !important; font-size: ${fSize}px; }
+                .q-btn { margin-top: 15px; padding: 10px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; width: 100%; transition: 0.3s; background: ${qBtnBg} !important; color: ${qBtnText} !important; font-size: ${fSize}px; }
                 
                 .q-fantasy { border: 2px solid; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-                .q-fantasy .q-title { border-bottom: 1px solid; padding-bottom: 5px; }
+                .q-fantasy .q-title { border-bottom: 1px solid; }
                 
                 .q-cyberpunk { border: 1px solid; box-shadow: 0 0 10px ${qBorder}; text-transform: uppercase; letter-spacing: 1px; border-radius: 0 !important; }
-                .q-cyberpunk .q-title { border-bottom: 1px dashed; padding-bottom: 5px; text-shadow: 0 0 5px ${qBorder}; }
+                .q-cyberpunk .q-title { border-bottom: 1px dashed; text-shadow: 0 0 5px ${qBorder}; }
                 .q-cyberpunk .q-btn { border-radius: 0 !important; box-shadow: 0 0 5px ${qBtnBg};}
                 
                 .q-rpg { border: 2px solid; border-radius: 0 !important; box-shadow: inset 0 0 10px #000; }
-                .q-rpg .q-title { border-bottom: 2px solid; padding-bottom: 5px; }
+                .q-rpg .q-title { border-bottom: 2px solid; }
                 `;
                 
                 if(qTrig === 'hover') {
@@ -919,7 +624,7 @@
   
   .g-shadow { position: absolute; bottom: 5%; width: 50%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, transparent 70%); border-radius: 50%; z-index: 1; pointer-events: none; }
   
-  .g-tt { position: absolute; top: 10%; background: ${ttBg}; color: ${ttCol}; border: 1px solid ${ttCol}; padding: 5px 15px; border-radius: 5px; font-weight: bold; font-size: ${fSize}px; opacity: 0; transition: 0.3s; z-index: 10; pointer-events: none; transform: translateY(10px); text-align: center;}
+  .g-tt { position: absolute; top: 10%; background: ${ttBg}; color: ${ttCol}; border: 1px solid ${ttCol}; padding: 10px 20px; border-radius: 5px; font-weight: bold; font-size: ${fSize}px; opacity: 0; transition: 0.3s; z-index: 10; pointer-events: none; transform: translateY(10px); text-align: center;}
   #g-img:hover ~ .g-tt { opacity: 1; transform: translateY(0); }
   
   .p-wrap { position: absolute; width: 100%; height: 100%; top:0; left:0; z-index: 2; pointer-events: none; overflow: hidden; }
@@ -990,4 +695,4 @@ ${scriptBlock}
 </script>
 
 </body>
-</html>
+</html>        
