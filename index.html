@@ -112,6 +112,26 @@
         .preview-tooltip { position: absolute; top: 10%; background: rgba(0,0,0,0.8); border: 1px solid var(--gold); color: var(--gold); padding: 5px 15px; border-radius: 5px; font-size: 0.9em; font-weight: bold; pointer-events: none; opacity: 0; transition: 0.3s; z-index: 10; transform: translateY(10px);}
         canvas:hover ~ .preview-tooltip.active { opacity: 1; transform: translateY(0); }
         
+        /* СТИЛИ ПРЕВЬЮ КВЕСТОВ */
+        #previewQuestBox {
+            position: absolute; right: 20px; top: 50%; transform: translateY(-50%); z-index: 20; padding: 15px; border-radius: 8px; width: 220px; text-align: left; display: none;
+        }
+        .quest-title { font-weight: bold; margin-bottom: 8px; font-size: 1.1em; }
+        .quest-desc { font-size: 0.85em; line-height: 1.4; word-wrap: break-word; }
+        .quest-btn { margin-top: 10px; padding: 8px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; width: 100%; pointer-events: none; }
+        
+        .quest-fantasy { background: #e8dcc4; color: #4a3b22; border: 2px solid #8b6d43; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); font-family: var(--font-heading); }
+        .quest-fantasy .quest-title { border-bottom: 1px solid #8b6d43; padding-bottom: 5px; }
+        .quest-fantasy .quest-btn { background: #8b6d43; color: #e8dcc4; }
+        
+        .quest-cyberpunk { background: rgba(10, 10, 20, 0.9); color: #0ff; border: 1px solid #0ff; box-shadow: 0 0 10px #0ff; text-transform: uppercase; letter-spacing: 1px; font-family: monospace; }
+        .quest-cyberpunk .quest-title { border-bottom: 1px dashed #0ff; padding-bottom: 5px; text-shadow: 0 0 5px #0ff; }
+        .quest-cyberpunk .quest-btn { background: #0ff; color: #000; box-shadow: 0 0 5px #0ff; }
+        
+        .quest-rpg { background: rgba(30, 30, 30, 0.9); color: #dfb23e; border: 2px solid #dfb23e; box-shadow: inset 0 0 10px #000; }
+        .quest-rpg .quest-title { border-bottom: 2px solid #dfb23e; padding-bottom: 5px; }
+        .quest-rpg .quest-btn { background: transparent; border: 1px solid #dfb23e; color: #dfb23e; }
+
         /* ЧАСТИЦЫ */
         .particles-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; overflow: hidden; display: none;}
         .particle { position: absolute; border-radius: 50%; animation: floatUp linear infinite; opacity: 0; }
@@ -297,6 +317,26 @@
                     <input type="text" id="audioInput" class="text-input" placeholder="🎵 URL звука при клике (.mp3)">
                 </div>
             </fieldset>
+
+            <!-- БЛОК: ЗАДАНИЯ И ДИАЛОГИ -->
+            <fieldset>
+                <legend>Задания и Квесты (Новое)</legend>
+                <div class="controls">
+                    <input type="text" id="questTitle" class="text-input" placeholder="📜 Заголовок задания (напр: Секрет гоблина)">
+                    <textarea id="questText" class="text-input" placeholder="Текст задания, условия и награда..." style="resize: vertical; min-height: 60px;"></textarea>
+                    
+                    <select id="questTrigger">
+                        <option value="hover">👀 Показывать при наведении</option>
+                        <option value="click">🖱️ Открывать окно по клику</option>
+                    </select>
+
+                    <select id="questStyle">
+                        <option value="fantasy">📜 Фэнтези (Свиток)</option>
+                        <option value="cyberpunk">💻 Киберпанк (Неон)</option>
+                        <option value="rpg">🪨 RPG Classic (Золото)</option>
+                    </select>
+                </div>
+            </fieldset>
         </div>
 
         <div class="buttons-group">
@@ -314,6 +354,7 @@
                 <div class="preview-shadow" id="previewShadow"></div>
                 <canvas id="canvas"></canvas>
                 <div class="preview-tooltip" id="previewTooltip"></div>
+                <div id="previewQuestBox"></div>
             </div>
         </div>
     </div>
@@ -342,6 +383,10 @@
         animClick: document.getElementById('animClick'),
         tooltipInput: document.getElementById('tooltipInput'),
         audioInput: document.getElementById('audioInput'),
+        questTitle: document.getElementById('questTitle'),
+        questText: document.getElementById('questText'),
+        questTrigger: document.getElementById('questTrigger'),
+        questStyle: document.getElementById('questStyle'),
         canvas: document.getElementById('canvas'),
         ctx: document.getElementById('canvas').getContext('2d', { willReadFrequently: true }),
         processBtn: document.getElementById('processBtn'),
@@ -350,6 +395,7 @@
         canvasWrapper: document.getElementById('canvasWrapper'),
         previewShadow: document.getElementById('previewShadow'),
         previewTooltip: document.getElementById('previewTooltip'),
+        previewQuestBox: document.getElementById('previewQuestBox'),
         particlesPreview: document.getElementById('particlesPreview'),
         previewBox: document.getElementById('previewBox')
     };
@@ -448,6 +494,19 @@
             els.previewTooltip.classList.remove('active');
         }
 
+        // Логика превью квеста
+        if(els.questTitle.value.trim() !== '' || els.questText.value.trim() !== '') {
+            let t = els.questTitle.value || 'Задание';
+            let d = els.questText.value.replace(/\n/g, '<br>') || 'Описание...';
+            let btn = els.questTrigger.value === 'click' ? '<button class="quest-btn">Принять</button>' : '';
+            
+            els.previewQuestBox.innerHTML = `<div class="quest-title">${t}</div><div class="quest-desc">${d}</div>${btn}`;
+            els.previewQuestBox.className = `quest-${els.questStyle.value}`;
+            els.previewQuestBox.style.display = 'block';
+        } else {
+            els.previewQuestBox.style.display = 'none';
+        }
+
         let ol = els.outlineCheck.checked;
         let c = els.outlineColor.value;
         let glowV = els.glowSlider.value;
@@ -461,7 +520,7 @@
         generateParticlesPreview();
     };
 
-    [els.animContinuous, els.animHover, els.animClick, els.tooltipInput].forEach(el => el.addEventListener('input', updatePreviewEffects));
+    [els.animContinuous, els.animHover, els.animClick, els.tooltipInput, els.questTitle, els.questText, els.questTrigger, els.questStyle].forEach(el => el.addEventListener('input', updatePreviewEffects));
 
     function generateParticlesPreview() {
         els.particlesPreview.innerHTML = '';
@@ -511,6 +570,8 @@
         els.glowSlider.value = 0;
         els.tooltipInput.value = '';
         els.audioInput.value = '';
+        els.questTitle.value = '';
+        els.questText.value = '';
         triggerUpdate();
     });
 
@@ -627,6 +688,53 @@
             
             if(audioStr !== '') clickLogic += `new Audio('${audioStr}').play();`;
 
+            // ЛОГИКА КВЕСТОВ И ДИАЛОГОВ
+            const qTitle = els.questTitle.value.replace(/"/g, '&quot;');
+            const qText = els.questText.value.replace(/\n/g, '<br>').replace(/"/g, '&quot;');
+            const qTrig = els.questTrigger.value;
+            const qStyle = els.questStyle.value;
+
+            let questHTML = '';
+            let questCSS = '';
+            
+            if(qTitle !== '' || qText !== '') {
+                let btnHTML = qTrig === 'click' ? '<button class="q-btn" onclick="document.getElementById(\'q-box\').classList.remove(\'show\'); event.stopPropagation();">Принять</button>' : '';
+                questHTML = `<div id="q-box" class="q-box q-${qStyle}"><div class="q-title">${qTitle}</div><div class="q-desc">${qText}</div>${btnHTML}</div>`;
+                
+                questCSS += `
+                .q-box { position: absolute; z-index: 20; padding: 15px; border-radius: 8px; width: 220px; text-align: left; opacity: 0; pointer-events: none; transition: 0.3s; font-family: sans-serif; box-sizing: border-box;}
+                .q-title { font-weight: bold; margin-bottom: 8px; font-size: 16px; }
+                .q-desc { font-size: 13px; line-height: 1.4; word-wrap: break-word;}
+                .q-btn { margin-top: 10px; padding: 8px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; width: 100%; transition: 0.3s;}
+                
+                .q-fantasy { background: #e8dcc4; color: #4a3b22; border: 2px solid #8b6d43; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); font-family: 'Cormorant Garamond', serif; }
+                .q-fantasy .q-title { border-bottom: 1px solid #8b6d43; padding-bottom: 5px; }
+                .q-fantasy .q-btn { background: #8b6d43; color: #e8dcc4; }
+                
+                .q-cyberpunk { background: rgba(10, 10, 20, 0.9); color: #0ff; border: 1px solid #0ff; box-shadow: 0 0 10px #0ff; text-transform: uppercase; letter-spacing: 1px; font-family: monospace; }
+                .q-cyberpunk .q-title { border-bottom: 1px dashed #0ff; padding-bottom: 5px; text-shadow: 0 0 5px #0ff; }
+                .q-cyberpunk .q-btn { background: #0ff; color: #000; box-shadow: 0 0 5px #0ff; }
+                
+                .q-rpg { background: rgba(30, 30, 30, 0.9); color: #dfb23e; border: 2px solid #dfb23e; border-radius: 0; box-shadow: inset 0 0 10px #000; }
+                .q-rpg .q-title { border-bottom: 2px solid #dfb23e; padding-bottom: 5px; }
+                .q-rpg .q-btn { background: transparent; border: 1px solid #dfb23e; color: #dfb23e; }
+                .q-rpg .q-btn:hover { background: #dfb23e; color: #000; }
+                `;
+                
+                if(qTrig === 'hover') {
+                    questCSS += `
+                    .q-box { left: 80%; top: 10%; display: block;}
+                    #g-img:hover ~ .q-box { opacity: 1; transform: translateX(10px); }
+                    `;
+                } else {
+                    questCSS += `
+                    .q-box { left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.9); display: none; text-align: center;}
+                    .q-box.show { display: block; opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+                    `;
+                    clickLogic += `document.getElementById('q-box').classList.add('show'); `;
+                }
+            }
+
             // Скрипт
             scriptBlock = `\n<script>document.getElementById('g-img').addEventListener('click', function(e) { ${clickLogic} });<\/script>`;
 
@@ -669,6 +777,8 @@
   
   .p-wrap { position: absolute; width: 100%; height: 100%; top:0; left:0; z-index: 2; pointer-events: none; overflow: hidden; }
   @keyframes p-anim { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(-50px) scale(1.5); opacity: 0; } }
+
+  ${questCSS}
 
   /* --- ВСЕ КЛАССЫ АНИМАЦИЙ --- */
   .anim-float { animation: float var(--anim-speed) ease-in-out infinite; }
@@ -713,6 +823,7 @@
     ${shadowHTML}
     <img id="g-img" src="${finalImageSrc}" class="${hov !== 'none' ? hov : ''}">
     ${tooltipHTML}
+    ${questHTML}
   </div>
 </div>
 ${scriptBlock}
