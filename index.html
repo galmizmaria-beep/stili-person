@@ -16,7 +16,7 @@
             --font-heading: 'Cormorant Garamond', serif;
             --font-main: 'Montserrat', sans-serif;
             --anim-speed: 2s;
-            --base-filter: none; /* Переменная для корректной работы hover-blur */
+            --base-filter: none;
         }
 
         body {
@@ -105,41 +105,38 @@
 
         #canvasWrapper { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; transition: all 0.3s ease; }
         
-        /* ИСПОЛЬЗУЕМ ПЕРЕМЕННУЮ ДЛЯ ФИЛЬТРА */
         canvas { max-width: 90%; max-height: 80%; object-fit: contain; transition: all 0.3s ease; cursor: pointer; position: relative; z-index: 5; filter: var(--base-filter);}
         
         .placeholder-text { position: absolute; color: #666; background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 10px; font-size: 0.9em; z-index: 10;}
 
         /* ДОП ЭФФЕКТЫ ПРЕВЬЮ */
         .preview-shadow { position: absolute; bottom: 5%; width: 50%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; display: none; z-index: 1;}
-        .preview-tooltip { position: absolute; top: 10%; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; font-size: 0.9em; font-weight: bold; pointer-events: none; opacity: 0; transition: 0.3s; z-index: 10; transform: translateY(10px); text-align: center;}
+        .preview-tooltip { position: absolute; top: 10%; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; font-weight: bold; pointer-events: none; opacity: 0; transition: 0.3s; z-index: 10; transform: translateY(10px); text-align: center;}
         canvas:hover ~ .preview-tooltip.active { opacity: 1; transform: translateY(0); }
         
         /* СТИЛИ ПРЕВЬЮ КВЕСТОВ */
         #previewQuestBox {
             position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 20; padding: 15px; border-radius: 8px; width: 280px; text-align: left; display: none; box-sizing: border-box;
         }
-        .quest-title { font-weight: bold; margin-bottom: 8px; font-size: 1.1em; text-align: center;}
+        .quest-title { font-weight: bold; margin-bottom: 8px; text-align: center;}
         
-        /* Скроллбары для длинного текста */
-        .quest-desc { font-size: 0.85em; line-height: 1.4; word-wrap: break-word; max-height: 250px; overflow-y: auto; padding-right: 5px;}
+        .quest-desc { line-height: 1.4; word-wrap: break-word; max-height: 250px; overflow-y: auto; padding-right: 5px;}
         .quest-desc::-webkit-scrollbar { width: 4px; }
         .quest-desc::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
         
         .quest-btn { margin-top: 10px; padding: 8px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; width: 100%; pointer-events: none; transition: 0.3s;}
         
-        /* Базовые стили. Цвета будут переопределяться через JS */
-        .quest-fantasy { border: 2px solid #8b6d43; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-        .quest-fantasy .quest-title { border-bottom: 1px solid #8b6d43; padding-bottom: 5px; }
-        .quest-fantasy .quest-btn { background: #8b6d43; color: #fff; }
+        /* Базовые стили */
+        .quest-fantasy { border: 2px solid; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+        .quest-fantasy .quest-title { border-bottom: 1px solid; padding-bottom: 5px; }
         
-        .quest-cyberpunk { border: 1px solid #0ff; box-shadow: 0 0 10px #0ff; text-transform: uppercase; letter-spacing: 1px; border-radius: 0 !important;}
-        .quest-cyberpunk .quest-title { border-bottom: 1px dashed #0ff; padding-bottom: 5px; text-shadow: 0 0 5px #0ff; }
-        .quest-cyberpunk .quest-btn { background: #0ff; color: #000; box-shadow: 0 0 5px #0ff; border-radius: 0 !important; }
+        .quest-cyberpunk { border: 1px solid; box-shadow: 0 0 10px #0ff; text-transform: uppercase; letter-spacing: 1px; border-radius: 0 !important;}
+        .quest-cyberpunk .quest-title { border-bottom: 1px dashed; padding-bottom: 5px; text-shadow: 0 0 5px #0ff; }
+        .quest-cyberpunk .quest-btn { box-shadow: 0 0 5px #0ff; border-radius: 0 !important; }
         
-        .quest-rpg { border: 2px solid #dfb23e; box-shadow: inset 0 0 10px #000; border-radius: 0 !important;}
-        .quest-rpg .quest-title { border-bottom: 2px solid #dfb23e; padding-bottom: 5px; }
-        .quest-rpg .quest-btn { background: transparent; border: 1px solid #dfb23e; color: inherit; }
+        .quest-rpg { border: 2px solid; box-shadow: inset 0 0 10px #000; border-radius: 0 !important;}
+        .quest-rpg .quest-title { border-bottom: 2px solid; padding-bottom: 5px; }
+        .quest-rpg .quest-btn { border: 1px solid; }
 
         /* ЧАСТИЦЫ */
         .particles-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; overflow: hidden; display: none;}
@@ -159,7 +156,7 @@
         .anim-ghost { animation: ghost var(--anim-speed) infinite alternate; }
 
         .hover-zoom:hover { transform: scale(1.15) !important; }
-        .hover-blur:hover { filter: var(--base-filter) blur(5px) !important; } /* ИСПРАВЛЕН БЛЮР */
+        .hover-blur:hover { filter: var(--base-filter) blur(5px) !important; }
         .hover-tilt:hover { transform: rotate(15deg) scale(1.05) !important; }
         .hover-squeeze:hover { transform: scaleY(0.8) scaleX(1.2) !important; }
         .hover-neon:hover { animation: neon calc(var(--anim-speed) / 2) alternate infinite; }
@@ -277,7 +274,7 @@
                 </div>
             </fieldset>
 
-            <!-- БЛОК: ТЕКСТ И ТУЛТИП (НОВЫЙ ФУНКЦИОНАЛ) -->
+            <!-- БЛОК: ТЕКСТ И ТУЛТИП -->
             <fieldset>
                 <legend>Текст и Имя персонажа (Тултип)</legend>
                 <div class="controls">
@@ -292,6 +289,11 @@
                         <option value="'Playfair Display', serif">Playfair (Элегантный)</option>
                         <option value="Impact, sans-serif">Impact (Мемный/Жирный)</option>
                     </select>
+                    
+                    <div class="slider-group">
+                        <label>Размер текста <span id="fontVal">14px</span></label>
+                        <input type="range" id="fontSizeSlider" min="10" max="26" value="14">
+                    </div>
 
                     <input type="text" id="tooltipInput" class="text-input" placeholder="💬 Всплывающее имя (напр: Гоблин 100HP)">
                     
@@ -310,7 +312,7 @@
                 </div>
             </fieldset>
 
-            <!-- БЛОК: ЗАДАНИЯ И КВЕСТЫ (ОБНОВЛЕНО) -->
+            <!-- БЛОК: ЗАДАНИЯ И КВЕСТЫ -->
             <fieldset>
                 <legend>Задания и Диалоги</legend>
                 <div class="controls">
@@ -339,6 +341,24 @@
                     <div class="slider-group">
                         <label>Прозрачность окна <span id="qOpVal">95%</span></label>
                         <input type="range" id="qBgOpacity" min="10" max="100" value="95">
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="color-group">
+                        <label>Цвет рамки окна:</label>
+                        <input type="color" id="qBorderColor" value="#dfb23e">
+                    </div>
+                    <div class="color-group">
+                        <label>Цвет линии-разделителя:</label>
+                        <input type="color" id="qDividerColor" value="#dfb23e">
+                    </div>
+                    <div class="color-group" id="btnColorGroup" style="display: none;">
+                        <label>Цвет кнопки (Фон / Текст):</label>
+                        <div style="display: flex; gap: 5px;">
+                            <input type="color" id="qBtnBgColor" value="#dfb23e" title="Цвет фона кнопки">
+                            <input type="color" id="qBtnTextColor" value="#000000" title="Цвет текста кнопки">
+                        </div>
                     </div>
                 </div>
             </fieldset>
@@ -429,6 +449,7 @@
         shadowCheck: document.getElementById('shadowCheck'),
         particlesSelect: document.getElementById('particlesSelect'),
         globalFont: document.getElementById('globalFont'),
+        fontSizeSlider: document.getElementById('fontSizeSlider'),
         tooltipInput: document.getElementById('tooltipInput'),
         ttTextColor: document.getElementById('ttTextColor'),
         ttBgColor: document.getElementById('ttBgColor'),
@@ -440,6 +461,11 @@
         qTextColor: document.getElementById('qTextColor'),
         qBgColor: document.getElementById('qBgColor'),
         qBgOpacity: document.getElementById('qBgOpacity'),
+        qBorderColor: document.getElementById('qBorderColor'),
+        qDividerColor: document.getElementById('qDividerColor'),
+        btnColorGroup: document.getElementById('btnColorGroup'),
+        qBtnBgColor: document.getElementById('qBtnBgColor'),
+        qBtnTextColor: document.getElementById('qBtnTextColor'),
         animSpeed: document.getElementById('animSpeed'),
         animContinuous: document.getElementById('animContinuous'),
         animHover: document.getElementById('animHover'),
@@ -465,7 +491,6 @@
     let inputMode = 'file'; 
     let maxCanvasSize = 600;
 
-    // HEX в RGBA конвертер
     function hexToRgba(hex, alpha) {
         let r = parseInt(hex.slice(1, 3), 16),
             g = parseInt(hex.slice(3, 5), 16),
@@ -518,6 +543,11 @@
         };
     }
 
+    els.questTrigger.addEventListener('change', () => {
+        els.btnColorGroup.style.display = els.questTrigger.value === 'click' ? 'flex' : 'none';
+        triggerUpdate();
+    });
+
     const triggerUpdate = () => {
         if (!isImageLoaded) return;
         document.getElementById('brightVal').textContent = els.brightnessSlider.value + '%';
@@ -525,6 +555,7 @@
         document.getElementById('glowVal').textContent = els.glowSlider.value;
         document.getElementById('ttOpVal').textContent = els.ttBgOpacity.value + '%';
         document.getElementById('qOpVal').textContent = els.qBgOpacity.value + '%';
+        document.getElementById('fontVal').textContent = els.fontSizeSlider.value + 'px';
         
         let s = els.animSpeed.value;
         document.getElementById('speedVal').textContent = s < 1 ? "Медленно" : (s > 2.5 ? "Быстро" : "Нормальная");
@@ -535,13 +566,13 @@
         resetProcessButton();
     };
 
-    const inputsToWatch = ['styleSelect', 'toningSelect', 'flipCheck', 'outlineCheck', 'shadowCheck', 'particlesSelect', 'globalFont'];
+    const inputsToWatch = ['styleSelect', 'toningSelect', 'flipCheck', 'outlineCheck', 'shadowCheck', 'particlesSelect', 'globalFont', 'questStyle'];
     inputsToWatch.forEach(id => els[id].addEventListener('change', triggerUpdate));
     
-    const slidersToWatch = ['brightnessSlider', 'opacitySlider', 'glowSlider', 'ttBgOpacity', 'qBgOpacity'];
+    const slidersToWatch = ['brightnessSlider', 'opacitySlider', 'glowSlider', 'ttBgOpacity', 'qBgOpacity', 'fontSizeSlider'];
     slidersToWatch.forEach(id => els[id].addEventListener('input', debounce(triggerUpdate, 50)));
 
-    const colorsToWatch = ['outlineColor', 'glowColor', 'ttTextColor', 'ttBgColor', 'qTextColor', 'qBgColor'];
+    const colorsToWatch = ['outlineColor', 'glowColor', 'ttTextColor', 'ttBgColor', 'qTextColor', 'qBgColor', 'qBorderColor', 'qDividerColor', 'qBtnBgColor', 'qBtnTextColor'];
     colorsToWatch.forEach(id => els[id].addEventListener('input', debounce(triggerUpdate, 100)));
 
     els.animSpeed.addEventListener('input', triggerUpdate);
@@ -554,22 +585,23 @@
 
         els.previewShadow.style.display = els.shadowCheck.checked ? 'block' : 'none';
 
-        // Глобальный шрифт
         const selFont = els.globalFont.value;
+        const fSize = els.fontSizeSlider.value;
 
-        // Логика Тултипа (Имени)
+        // Тултип
         if(els.tooltipInput.value.trim() !== '') {
             els.previewTooltip.textContent = els.tooltipInput.value;
             els.previewTooltip.style.fontFamily = selFont;
+            els.previewTooltip.style.fontSize = fSize + 'px';
             els.previewTooltip.style.color = els.ttTextColor.value;
             els.previewTooltip.style.backgroundColor = hexToRgba(els.ttBgColor.value, els.ttBgOpacity.value / 100);
-            els.previewTooltip.style.borderColor = els.ttTextColor.value; // бордер в цвет текста
+            els.previewTooltip.style.borderColor = els.ttTextColor.value;
             els.previewTooltip.classList.add('active');
         } else {
             els.previewTooltip.classList.remove('active');
         }
 
-        // Логика Квеста
+        // Квест
         if(els.questTitle.value.trim() !== '' || els.questText.value.trim() !== '') {
             let t = els.questTitle.value || 'Задание';
             let d = els.questText.value.replace(/\n/g, '<br>') || 'Описание...';
@@ -578,12 +610,27 @@
             els.previewQuestBox.innerHTML = `<div class="quest-title">${t}</div><div class="quest-desc">${d}</div>${btn}`;
             els.previewQuestBox.className = `quest-${els.questStyle.value}`;
             els.previewQuestBox.style.fontFamily = selFont;
+            
+            // Настройка цветов и шрифтов
             els.previewQuestBox.style.color = els.qTextColor.value;
             els.previewQuestBox.style.backgroundColor = hexToRgba(els.qBgColor.value, els.qBgOpacity.value / 100);
+            els.previewQuestBox.style.borderColor = els.qBorderColor.value;
             
-            // Красим кнопку в цвет фона, а текст кнопки в цвет текста квеста
+            let qTitleEl = els.previewQuestBox.querySelector('.quest-title');
+            if(qTitleEl) {
+                qTitleEl.style.borderBottomColor = els.qDividerColor.value;
+                qTitleEl.style.fontSize = (parseInt(fSize) + 2) + 'px'; // Заголовок чуть больше
+            }
+            
+            let qDescEl = els.previewQuestBox.querySelector('.quest-desc');
+            if(qDescEl) qDescEl.style.fontSize = fSize + 'px';
+
             let qb = els.previewQuestBox.querySelector('.quest-btn');
-            if(qb) { qb.style.color = els.qBgColor.value; qb.style.backgroundColor = els.qTextColor.value; }
+            if(qb) { 
+                qb.style.backgroundColor = els.qBtnBgColor.value; 
+                qb.style.color = els.qBtnTextColor.value;
+                qb.style.fontSize = fSize + 'px';
+            }
 
             els.previewQuestBox.style.display = 'block';
         } else {
@@ -599,13 +646,12 @@
         if(ol) dropShadowCSS += `drop-shadow(2px 0 0 ${c}) drop-shadow(-2px 0 0 ${c}) drop-shadow(0 2px 0 ${c}) drop-shadow(0 -2px 0 ${c}) `;
         if(glowV > 0) dropShadowCSS += `drop-shadow(0 0 ${glowV}px ${glowC}) `;
         
-        // Устанавливаем базу для hover-blur через CSS переменную
         els.canvas.style.setProperty('--base-filter', dropShadowCSS.trim() || 'none');
         
         generateParticlesPreview();
     };
 
-    [els.animContinuous, els.animHover, els.animClick, els.tooltipInput, els.questTitle, els.questText, els.questTrigger, els.questStyle].forEach(el => el.addEventListener('input', updatePreviewEffects));
+    [els.animContinuous, els.animHover, els.animClick, els.tooltipInput, els.questTitle, els.questText].forEach(el => el.addEventListener('input', updatePreviewEffects));
 
     function generateParticlesPreview() {
         els.particlesPreview.innerHTML = '';
@@ -659,6 +705,12 @@
         els.questText.value = '';
         els.ttBgOpacity.value = 80;
         els.qBgOpacity.value = 95;
+        els.fontSizeSlider.value = 14;
+        els.qBorderColor.value = '#dfb23e';
+        els.qDividerColor.value = '#dfb23e';
+        els.qBtnBgColor.value = '#dfb23e';
+        els.qBtnTextColor.value = '#000000';
+        els.btnColorGroup.style.display = 'none';
         triggerUpdate();
     });
 
@@ -741,6 +793,7 @@
             }
 
             const fontFam = els.globalFont.value;
+            const fSize = els.fontSizeSlider.value;
             const cont = els.animContinuous.value;
             const hov = els.animHover.value;
             const clk = els.animClick.value;
@@ -789,30 +842,34 @@
             const qStyle = els.questStyle.value;
             const qTCol = els.qTextColor.value;
             const qBg = hexToRgba(els.qBgColor.value, els.qBgOpacity.value / 100);
+            const qBorder = els.qBorderColor.value;
+            const qDivider = els.qDividerColor.value;
+            const qBtnBg = els.qBtnBgColor.value;
+            const qBtnText = els.qBtnTextColor.value;
 
             let questHTML = '';
             let questCSS = '';
             
             if(qTitle !== '' || qText !== '') {
-                let btnHTML = qTrig === 'click' ? `<button class="q-btn" style="color:${els.qBgColor.value}; background:${qTCol};" onclick="document.getElementById('q-box').classList.remove('show'); event.stopPropagation();">Принять</button>` : '';
-                questHTML = `<div id="q-box" class="q-box q-${qStyle}" style="color:${qTCol}; background:${qBg};"><div class="q-title">${qTitle}</div><div class="q-desc">${qText}</div>${btnHTML}</div>`;
+                let btnHTML = qTrig === 'click' ? `<button class="q-btn" onclick="document.getElementById('q-box').classList.remove('show'); event.stopPropagation();">Принять</button>` : '';
+                questHTML = `<div id="q-box" class="q-box q-${qStyle}"><div class="q-title">${qTitle}</div><div class="q-desc">${qText}</div>${btnHTML}</div>`;
                 
                 questCSS += `
-                .q-box { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.9); z-index: 20; padding: 15px; border-radius: 8px; width: 280px; text-align: left; opacity: 0; pointer-events: none; transition: 0.3s; font-family: ${fontFam}; box-sizing: border-box; display: none;}
-                .q-title { font-weight: bold; margin-bottom: 8px; font-size: 16px; text-align: center;}
-                .q-desc { font-size: 13px; line-height: 1.4; word-wrap: break-word; max-height: 250px; overflow-y: auto; padding-right:5px;}
+                .q-box { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.9); z-index: 20; padding: 15px; border-radius: 8px; width: 280px; text-align: left; opacity: 0; pointer-events: none; transition: 0.3s; font-family: ${fontFam}; box-sizing: border-box; display: none; color: ${qTCol}; background: ${qBg}; border-color: ${qBorder} !important; font-size: ${fSize}px; }
+                .q-title { font-weight: bold; margin-bottom: 8px; text-align: center; border-bottom-color: ${qDivider} !important; font-size: ${parseInt(fSize) + 2}px;}
+                .q-desc { line-height: 1.4; word-wrap: break-word; max-height: 250px; overflow-y: auto; padding-right:5px;}
                 .q-desc::-webkit-scrollbar { width: 4px; } .q-desc::-webkit-scrollbar-thumb { background: ${qTCol}; border-radius: 4px; }
-                .q-btn { margin-top: 10px; padding: 8px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; width: 100%; transition: 0.3s;}
+                .q-btn { margin-top: 10px; padding: 8px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; width: 100%; transition: 0.3s; background: ${qBtnBg} !important; color: ${qBtnText} !important; font-size: ${fSize}px; }
                 
-                .q-fantasy { border: 2px solid #8b6d43; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-                .q-fantasy .q-title { border-bottom: 1px solid #8b6d43; padding-bottom: 5px; }
+                .q-fantasy { border: 2px solid; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+                .q-fantasy .q-title { border-bottom: 1px solid; padding-bottom: 5px; }
                 
-                .q-cyberpunk { border: 1px solid #0ff; box-shadow: 0 0 10px #0ff; text-transform: uppercase; letter-spacing: 1px; border-radius: 0 !important; }
-                .q-cyberpunk .q-title { border-bottom: 1px dashed #0ff; padding-bottom: 5px; text-shadow: 0 0 5px #0ff; }
-                .q-cyberpunk .q-btn { border-radius: 0 !important; }
+                .q-cyberpunk { border: 1px solid; box-shadow: 0 0 10px ${qBorder}; text-transform: uppercase; letter-spacing: 1px; border-radius: 0 !important; }
+                .q-cyberpunk .q-title { border-bottom: 1px dashed; padding-bottom: 5px; text-shadow: 0 0 5px ${qBorder}; }
+                .q-cyberpunk .q-btn { border-radius: 0 !important; box-shadow: 0 0 5px ${qBtnBg};}
                 
-                .q-rpg { border: 2px solid #dfb23e; border-radius: 0 !important; box-shadow: inset 0 0 10px #000; }
-                .q-rpg .q-title { border-bottom: 2px solid #dfb23e; padding-bottom: 5px; }
+                .q-rpg { border: 2px solid; border-radius: 0 !important; box-shadow: inset 0 0 10px #000; }
+                .q-rpg .q-title { border-bottom: 2px solid; padding-bottom: 5px; }
                 `;
                 
                 if(qTrig === 'hover') {
@@ -862,7 +919,7 @@
   
   .g-shadow { position: absolute; bottom: 5%; width: 50%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, transparent 70%); border-radius: 50%; z-index: 1; pointer-events: none; }
   
-  .g-tt { position: absolute; top: 10%; background: ${ttBg}; color: ${ttCol}; border: 1px solid ${ttCol}; padding: 5px 15px; border-radius: 5px; font-size: 14px; font-weight: bold; opacity: 0; transition: 0.3s; z-index: 10; pointer-events: none; transform: translateY(10px); text-align: center;}
+  .g-tt { position: absolute; top: 10%; background: ${ttBg}; color: ${ttCol}; border: 1px solid ${ttCol}; padding: 5px 15px; border-radius: 5px; font-weight: bold; font-size: ${fSize}px; opacity: 0; transition: 0.3s; z-index: 10; pointer-events: none; transform: translateY(10px); text-align: center;}
   #g-img:hover ~ .g-tt { opacity: 1; transform: translateY(0); }
   
   .p-wrap { position: absolute; width: 100%; height: 100%; top:0; left:0; z-index: 2; pointer-events: none; overflow: hidden; }
