@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Продвинутый редактор персонажа (PRO)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Подключаем максимальный набор шрифтов -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Montserrat:wght@400;600&family=Cinzel:wght@700&family=Courier+Prime:wght@700&family=Oswald:wght@500&family=Playfair+Display:wght@700&family=Roboto:wght@500&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-dark: #121110;
@@ -15,6 +16,7 @@
             --font-heading: 'Cormorant Garamond', serif;
             --font-main: 'Montserrat', sans-serif;
             --anim-speed: 2s;
+            --base-filter: none; /* Переменная для корректной работы hover-blur */
         }
 
         body {
@@ -31,7 +33,7 @@
             background-color: var(--bg-panel);
             padding: 25px; border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.9), 0 0 20px rgba(223, 178, 62, 0.15);
-            width: 98%; max-width: 1400px; height: 95vh;
+            width: 98%; max-width: 1500px; height: 95vh;
             display: flex; gap: 20px; box-sizing: border-box;
         }
 
@@ -58,11 +60,9 @@
         legend { color: var(--gold); font-weight: 600; font-size: 0.9em; padding: 0 10px; }
         .controls { display: flex; flex-direction: column; gap: 10px; }
 
-        /* Табы загрузки */
         .upload-tabs { display: flex; gap: 10px; margin-bottom: 10px; }
         .tab-btn { flex: 1; background: #2a2a2a; color: #888; border: 1px solid #444; padding: 8px; border-radius: 5px; cursor: pointer; font-size: 0.8em; transition: 0.3s; }
         .tab-btn.active { background: var(--gold); color: #000; border-color: var(--gold); font-weight: bold; }
-        
         .upload-section { display: none; }
         .upload-section.active { display: block; }
         
@@ -70,17 +70,17 @@
         .custom-file-upload { border: 2px dashed var(--gold); padding: 10px; border-radius: 8px; cursor: pointer; transition: 0.3s; color: var(--gold); font-weight: 600; text-align: center; display: block; font-size: 0.9em; }
         .custom-file-upload:hover { background-color: rgba(223, 178, 62, 0.1); }
         
-        .text-input { width: 100%; padding: 10px; background-color: #111; color: #fff; border: 1px solid #555; border-radius: 8px; font-family: var(--font-main); font-size: 0.85em; outline: none; box-sizing: border-box; }
+        .text-input { width: 100%; padding: 10px; background-color: #111; color: #fff; border: 1px solid #555; border-radius: 8px; font-family: inherit; font-size: 0.85em; outline: none; box-sizing: border-box; }
         .text-input:focus { border-color: var(--gold); }
 
-        select { width: 100%; padding: 8px; background-color: #111; color: var(--text-light); border: 1px solid #555; border-radius: 8px; font-family: var(--font-main); font-size: 0.85em; outline: none; cursor: pointer; }
-        .slider-group { display: flex; flex-direction: column; gap: 4px; }
-        .slider-group label { font-size: 0.8em; color: #ccc; display: flex; justify-content: space-between; }
+        select { width: 100%; padding: 8px; background-color: #111; color: var(--text-light); border: 1px solid #555; border-radius: 8px; font-family: inherit; font-size: 0.85em; outline: none; cursor: pointer; }
+        .slider-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px;}
+        .slider-group label { font-size: 0.8em; color: #ccc; display: flex; justify-content: space-between; align-items: center;}
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: var(--gold); cursor: pointer; margin-top: -5px; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: #555; border-radius: 2px; }
 
-        .color-group { display: flex; align-items: center; justify-content: space-between; font-size: 0.85em; color: #ccc;}
+        .color-group { display: flex; align-items: center; justify-content: space-between; font-size: 0.8em; color: #ccc;}
         input[type="color"] { border: none; width: 35px; height: 25px; border-radius: 5px; cursor: pointer; background: none; }
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border: 1px solid #666; border-radius: 5px; }
@@ -104,33 +104,42 @@
         }
 
         #canvasWrapper { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; transition: all 0.3s ease; }
-        canvas { max-width: 90%; max-height: 80%; object-fit: contain; transition: all 0.3s ease; cursor: pointer; position: relative; z-index: 5;}
+        
+        /* ИСПОЛЬЗУЕМ ПЕРЕМЕННУЮ ДЛЯ ФИЛЬТРА */
+        canvas { max-width: 90%; max-height: 80%; object-fit: contain; transition: all 0.3s ease; cursor: pointer; position: relative; z-index: 5; filter: var(--base-filter);}
+        
         .placeholder-text { position: absolute; color: #666; background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 10px; font-size: 0.9em; z-index: 10;}
 
         /* ДОП ЭФФЕКТЫ ПРЕВЬЮ */
         .preview-shadow { position: absolute; bottom: 5%; width: 50%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; display: none; z-index: 1;}
-        .preview-tooltip { position: absolute; top: 10%; background: rgba(0,0,0,0.8); border: 1px solid var(--gold); color: var(--gold); padding: 5px 15px; border-radius: 5px; font-size: 0.9em; font-weight: bold; pointer-events: none; opacity: 0; transition: 0.3s; z-index: 10; transform: translateY(10px);}
+        .preview-tooltip { position: absolute; top: 10%; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; font-size: 0.9em; font-weight: bold; pointer-events: none; opacity: 0; transition: 0.3s; z-index: 10; transform: translateY(10px); text-align: center;}
         canvas:hover ~ .preview-tooltip.active { opacity: 1; transform: translateY(0); }
         
         /* СТИЛИ ПРЕВЬЮ КВЕСТОВ */
         #previewQuestBox {
-            position: absolute; right: 20px; top: 50%; transform: translateY(-50%); z-index: 20; padding: 15px; border-radius: 8px; width: 220px; text-align: left; display: none;
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 20; padding: 15px; border-radius: 8px; width: 280px; text-align: left; display: none; box-sizing: border-box;
         }
-        .quest-title { font-weight: bold; margin-bottom: 8px; font-size: 1.1em; }
-        .quest-desc { font-size: 0.85em; line-height: 1.4; word-wrap: break-word; }
-        .quest-btn { margin-top: 10px; padding: 8px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; width: 100%; pointer-events: none; }
+        .quest-title { font-weight: bold; margin-bottom: 8px; font-size: 1.1em; text-align: center;}
         
-        .quest-fantasy { background: #e8dcc4; color: #4a3b22; border: 2px solid #8b6d43; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); font-family: var(--font-heading); }
+        /* Скроллбары для длинного текста */
+        .quest-desc { font-size: 0.85em; line-height: 1.4; word-wrap: break-word; max-height: 250px; overflow-y: auto; padding-right: 5px;}
+        .quest-desc::-webkit-scrollbar { width: 4px; }
+        .quest-desc::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+        
+        .quest-btn { margin-top: 10px; padding: 8px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; width: 100%; pointer-events: none; transition: 0.3s;}
+        
+        /* Базовые стили. Цвета будут переопределяться через JS */
+        .quest-fantasy { border: 2px solid #8b6d43; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
         .quest-fantasy .quest-title { border-bottom: 1px solid #8b6d43; padding-bottom: 5px; }
-        .quest-fantasy .quest-btn { background: #8b6d43; color: #e8dcc4; }
+        .quest-fantasy .quest-btn { background: #8b6d43; color: #fff; }
         
-        .quest-cyberpunk { background: rgba(10, 10, 20, 0.9); color: #0ff; border: 1px solid #0ff; box-shadow: 0 0 10px #0ff; text-transform: uppercase; letter-spacing: 1px; font-family: monospace; }
+        .quest-cyberpunk { border: 1px solid #0ff; box-shadow: 0 0 10px #0ff; text-transform: uppercase; letter-spacing: 1px; border-radius: 0 !important;}
         .quest-cyberpunk .quest-title { border-bottom: 1px dashed #0ff; padding-bottom: 5px; text-shadow: 0 0 5px #0ff; }
-        .quest-cyberpunk .quest-btn { background: #0ff; color: #000; box-shadow: 0 0 5px #0ff; }
+        .quest-cyberpunk .quest-btn { background: #0ff; color: #000; box-shadow: 0 0 5px #0ff; border-radius: 0 !important; }
         
-        .quest-rpg { background: rgba(30, 30, 30, 0.9); color: #dfb23e; border: 2px solid #dfb23e; box-shadow: inset 0 0 10px #000; }
+        .quest-rpg { border: 2px solid #dfb23e; box-shadow: inset 0 0 10px #000; border-radius: 0 !important;}
         .quest-rpg .quest-title { border-bottom: 2px solid #dfb23e; padding-bottom: 5px; }
-        .quest-rpg .quest-btn { background: transparent; border: 1px solid #dfb23e; color: #dfb23e; }
+        .quest-rpg .quest-btn { background: transparent; border: 1px solid #dfb23e; color: inherit; }
 
         /* ЧАСТИЦЫ */
         .particles-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; overflow: hidden; display: none;}
@@ -150,7 +159,7 @@
         .anim-ghost { animation: ghost var(--anim-speed) infinite alternate; }
 
         .hover-zoom:hover { transform: scale(1.15) !important; }
-        .hover-blur:hover { filter: blur(5px); }
+        .hover-blur:hover { filter: var(--base-filter) blur(5px) !important; } /* ИСПРАВЛЕН БЛЮР */
         .hover-tilt:hover { transform: rotate(15deg) scale(1.05) !important; }
         .hover-squeeze:hover { transform: scaleY(0.8) scaleX(1.2) !important; }
         .hover-neon:hover { animation: neon calc(var(--anim-speed) / 2) alternate infinite; }
@@ -164,19 +173,21 @@
         .click-glitch-trigger { animation: glitch 0.3s linear infinite !important; }
 
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); filter: brightness(130%); } 100% { transform: scale(1); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); filter: var(--base-filter) brightness(130%); } 100% { transform: scale(1); } }
         @keyframes breathe { 0%, 100% { transform: scaleY(1) scaleX(1); } 50% { transform: scaleY(1.05) scaleX(0.98); } }
         @keyframes wobble { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
         @keyframes glitch { 0% { transform: translate(0) } 20% { transform: translate(-3px, 3px) } 40% { transform: translate(-3px, -3px) } 60% { transform: translate(3px, 3px) } 80% { transform: translate(3px, -3px) } 100% { transform: translate(0) } }
         @keyframes bounce { 0% { transform: translateY(0); } 40% { transform: translateY(-60px) scaleY(1.1); } 100% { transform: translateY(0) scaleY(1); } }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes neon { 0% { filter: brightness(100%) drop-shadow(0 0 5px var(--gold)); } 100% { filter: brightness(150%) drop-shadow(0 0 20px var(--gold)); } }
+        @keyframes neon { 0% { filter: var(--base-filter) drop-shadow(0 0 5px var(--gold)); } 100% { filter: var(--base-filter) drop-shadow(0 0 20px var(--gold)); } }
         @keyframes swing { 20% { transform: rotate(15deg); } 40% { transform: rotate(-10deg); } 60% { transform: rotate(5deg); } 80% { transform: rotate(-5deg); } 100% { transform: rotate(0deg); } }
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
-        @keyframes ghost { 0% { opacity: 1; filter: grayscale(0%);} 100% { opacity: 0.3; filter: grayscale(80%) blur(2px);} }
+        @keyframes ghost { 0% { opacity: 1; filter: var(--base-filter) grayscale(0%);} 100% { opacity: 0.3; filter: var(--base-filter) grayscale(80%) blur(2px);} }
         @keyframes squish { 0%, 100% { transform: scale(1); } 50% { transform: scaleY(0.4) scaleX(1.5) translateY(30%); } }
         @keyframes vanish { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(2); } }
         @keyframes flip { 0% { transform: perspective(400px) rotateY(0deg); } 100% { transform: perspective(400px) rotateY(360deg); } }
+        
+        .divider { height: 1px; background: #444; margin: 10px 0; }
     </style>
 </head>
 <body>
@@ -205,7 +216,7 @@
 
             <!-- БЛОК: ВНЕШНИЙ ВИД -->
             <fieldset>
-                <legend>Внешний вид и Статусы</legend>
+                <legend>Внешний вид и Окружение</legend>
                 <div class="controls">
                     <select id="styleSelect">
                         <option value="none">Оригинал (Без стиля)</option>
@@ -236,20 +247,16 @@
                         <label>Яркость <span id="brightVal">100%</span></label>
                         <input type="range" id="brightnessSlider" min="10" max="250" value="100">
                     </div>
-                </div>
-            </fieldset>
 
-            <!-- БЛОК: ЭФФЕКТЫ -->
-            <fieldset>
-                <legend>Эффекты и Окружение</legend>
-                <div class="controls">
+                    <div class="divider"></div>
+
                     <div class="slider-group">
                         <label>Магическое свечение <span id="glowVal">0</span></label>
                         <input type="range" id="glowSlider" min="0" max="80" value="0">
                     </div>
                     
                     <div class="color-group" style="margin-bottom: 5px;">
-                        <label class="checkbox-group"><input type="checkbox" id="outlineCheck"> Обводка контура (Stroke)</label>
+                        <label class="checkbox-group"><input type="checkbox" id="outlineCheck"> Обводка контура</label>
                         <input type="color" id="outlineColor" value="#ffffff">
                     </div>
 
@@ -258,7 +265,7 @@
                         <input type="color" id="glowColor" value="#dfb23e">
                     </div>
 
-                    <label class="checkbox-group"><input type="checkbox" id="shadowCheck"> 🕳️ Тень на полу (Приземление)</label>
+                    <label class="checkbox-group"><input type="checkbox" id="shadowCheck"> 🕳️ Тень на полу</label>
 
                     <select id="particlesSelect">
                         <option value="none">Без фоновых частиц</option>
@@ -270,9 +277,75 @@
                 </div>
             </fieldset>
 
+            <!-- БЛОК: ТЕКСТ И ТУЛТИП (НОВЫЙ ФУНКЦИОНАЛ) -->
+            <fieldset>
+                <legend>Текст и Имя персонажа (Тултип)</legend>
+                <div class="controls">
+                    <select id="globalFont">
+                        <option value="'Montserrat', sans-serif">Montserrat (Современный)</option>
+                        <option value="'Roboto', sans-serif">Roboto (Универсальный)</option>
+                        <option value="'Cormorant Garamond', serif">Cormorant (Фэнтези/Книги)</option>
+                        <option value="'Cinzel', serif">Cinzel (Эпичный/RPG)</option>
+                        <option value="'Oswald', sans-serif">Oswald (Узкий/Киберпанк)</option>
+                        <option value="'Courier Prime', monospace">Courier (Печатная машинка)</option>
+                        <option value="'Comic Neue', cursive">Comic Neue (Комикс/Казуальный)</option>
+                        <option value="'Playfair Display', serif">Playfair (Элегантный)</option>
+                        <option value="Impact, sans-serif">Impact (Мемный/Жирный)</option>
+                    </select>
+
+                    <input type="text" id="tooltipInput" class="text-input" placeholder="💬 Всплывающее имя (напр: Гоблин 100HP)">
+                    
+                    <div class="color-group">
+                        <label>Цвет текста имени:</label>
+                        <input type="color" id="ttTextColor" value="#dfb23e">
+                    </div>
+                    <div class="color-group">
+                        <label>Цвет плашки (фона):</label>
+                        <input type="color" id="ttBgColor" value="#000000">
+                    </div>
+                    <div class="slider-group">
+                        <label>Прозрачность плашки имени <span id="ttOpVal">80%</span></label>
+                        <input type="range" id="ttBgOpacity" min="0" max="100" value="80">
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- БЛОК: ЗАДАНИЯ И КВЕСТЫ (ОБНОВЛЕНО) -->
+            <fieldset>
+                <legend>Задания и Диалоги</legend>
+                <div class="controls">
+                    <input type="text" id="questTitle" class="text-input" placeholder="📜 Заголовок (напр: Секрет гоблина)">
+                    <textarea id="questText" class="text-input" placeholder="Текст задания... Можно писать очень длинный текст, появится скролл." style="resize: vertical; min-height: 80px;"></textarea>
+                    
+                    <select id="questTrigger">
+                        <option value="hover">👀 Показывать окно ПРИ НАВЕДЕНИИ</option>
+                        <option value="click">🖱️ Открывать окно ПО КЛИКУ</option>
+                    </select>
+
+                    <select id="questStyle">
+                        <option value="fantasy">📜 Фэнтези (Свиток)</option>
+                        <option value="cyberpunk">💻 Киберпанк (Неон)</option>
+                        <option value="rpg">🪨 RPG Classic (Золото)</option>
+                    </select>
+
+                    <div class="color-group">
+                        <label>Цвет текста окна:</label>
+                        <input type="color" id="qTextColor" value="#e0e0e0">
+                    </div>
+                    <div class="color-group">
+                        <label>Цвет фона окна:</label>
+                        <input type="color" id="qBgColor" value="#1e1e1e">
+                    </div>
+                    <div class="slider-group">
+                        <label>Прозрачность окна <span id="qOpVal">95%</span></label>
+                        <input type="range" id="qBgOpacity" min="10" max="100" value="95">
+                    </div>
+                </div>
+            </fieldset>
+
             <!-- БЛОК: АНИМАЦИИ И ИНТЕРАКТИВ -->
             <fieldset>
-                <legend>Анимации и Интерактив (Клик / Наведение)</legend>
+                <legend>Анимации (Поведение)</legend>
                 <div class="controls">
                     <div class="slider-group">
                         <label>Скорость анимаций <span id="speedVal">Нормальная</span></label>
@@ -313,28 +386,7 @@
                         <option value="click-glitch">💻 Критический сбой</option>
                     </select>
 
-                    <input type="text" id="tooltipInput" class="text-input" placeholder="💬 Всплывающее имя (напр: Гоблин 100HP)">
                     <input type="text" id="audioInput" class="text-input" placeholder="🎵 URL звука при клике (.mp3)">
-                </div>
-            </fieldset>
-
-            <!-- БЛОК: ЗАДАНИЯ И ДИАЛОГИ -->
-            <fieldset>
-                <legend>Задания и Квесты (Новое)</legend>
-                <div class="controls">
-                    <input type="text" id="questTitle" class="text-input" placeholder="📜 Заголовок задания (напр: Секрет гоблина)">
-                    <textarea id="questText" class="text-input" placeholder="Текст задания, условия и награда..." style="resize: vertical; min-height: 60px;"></textarea>
-                    
-                    <select id="questTrigger">
-                        <option value="hover">👀 Показывать при наведении</option>
-                        <option value="click">🖱️ Открывать окно по клику</option>
-                    </select>
-
-                    <select id="questStyle">
-                        <option value="fantasy">📜 Фэнтези (Свиток)</option>
-                        <option value="cyberpunk">💻 Киберпанк (Неон)</option>
-                        <option value="rpg">🪨 RPG Classic (Золото)</option>
-                    </select>
                 </div>
             </fieldset>
         </div>
@@ -361,7 +413,6 @@
 </div>
 
 <script>
-    // Инициализация элементов
     const els = {
         imageUpload: document.getElementById('imageUpload'),
         imageUrl: document.getElementById('imageUrl'),
@@ -377,16 +428,23 @@
         outlineColor: document.getElementById('outlineColor'),
         shadowCheck: document.getElementById('shadowCheck'),
         particlesSelect: document.getElementById('particlesSelect'),
-        animSpeed: document.getElementById('animSpeed'),
-        animContinuous: document.getElementById('animContinuous'),
-        animHover: document.getElementById('animHover'),
-        animClick: document.getElementById('animClick'),
+        globalFont: document.getElementById('globalFont'),
         tooltipInput: document.getElementById('tooltipInput'),
-        audioInput: document.getElementById('audioInput'),
+        ttTextColor: document.getElementById('ttTextColor'),
+        ttBgColor: document.getElementById('ttBgColor'),
+        ttBgOpacity: document.getElementById('ttBgOpacity'),
         questTitle: document.getElementById('questTitle'),
         questText: document.getElementById('questText'),
         questTrigger: document.getElementById('questTrigger'),
         questStyle: document.getElementById('questStyle'),
+        qTextColor: document.getElementById('qTextColor'),
+        qBgColor: document.getElementById('qBgColor'),
+        qBgOpacity: document.getElementById('qBgOpacity'),
+        animSpeed: document.getElementById('animSpeed'),
+        animContinuous: document.getElementById('animContinuous'),
+        animHover: document.getElementById('animHover'),
+        animClick: document.getElementById('animClick'),
+        audioInput: document.getElementById('audioInput'),
         canvas: document.getElementById('canvas'),
         ctx: document.getElementById('canvas').getContext('2d', { willReadFrequently: true }),
         processBtn: document.getElementById('processBtn'),
@@ -407,14 +465,20 @@
     let inputMode = 'file'; 
     let maxCanvasSize = 600;
 
-    // Вкладки загрузки
+    // HEX в RGBA конвертер
+    function hexToRgba(hex, alpha) {
+        let r = parseInt(hex.slice(1, 3), 16),
+            g = parseInt(hex.slice(3, 5), 16),
+            b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
     window.switchTab = function(mode) {
         inputMode = mode;
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.upload-section').forEach(sec => sec.classList.remove('active'));
         document.querySelector(`.tab-btn[onclick="switchTab('${mode}')"]`).classList.add('active');
         document.getElementById(`tab-${mode}`).classList.add('active');
-        
         if(mode === 'url' && els.imageUrl.value) loadImageUrl();
     }
 
@@ -459,6 +523,8 @@
         document.getElementById('brightVal').textContent = els.brightnessSlider.value + '%';
         document.getElementById('opacityVal').textContent = els.opacitySlider.value + '%';
         document.getElementById('glowVal').textContent = els.glowSlider.value;
+        document.getElementById('ttOpVal').textContent = els.ttBgOpacity.value + '%';
+        document.getElementById('qOpVal').textContent = els.qBgOpacity.value + '%';
         
         let s = els.animSpeed.value;
         document.getElementById('speedVal').textContent = s < 1 ? "Медленно" : (s > 2.5 ? "Быстро" : "Нормальная");
@@ -469,14 +535,15 @@
         resetProcessButton();
     };
 
-    const inputsToWatch = ['styleSelect', 'toningSelect', 'flipCheck', 'outlineCheck', 'shadowCheck', 'particlesSelect'];
+    const inputsToWatch = ['styleSelect', 'toningSelect', 'flipCheck', 'outlineCheck', 'shadowCheck', 'particlesSelect', 'globalFont'];
     inputsToWatch.forEach(id => els[id].addEventListener('change', triggerUpdate));
     
-    const slidersToWatch = ['brightnessSlider', 'opacitySlider', 'glowSlider'];
+    const slidersToWatch = ['brightnessSlider', 'opacitySlider', 'glowSlider', 'ttBgOpacity', 'qBgOpacity'];
     slidersToWatch.forEach(id => els[id].addEventListener('input', debounce(triggerUpdate, 50)));
 
-    els.outlineColor.addEventListener('input', debounce(triggerUpdate, 100));
-    els.glowColor.addEventListener('input', debounce(triggerUpdate, 100));
+    const colorsToWatch = ['outlineColor', 'glowColor', 'ttTextColor', 'ttBgColor', 'qTextColor', 'qBgColor'];
+    colorsToWatch.forEach(id => els[id].addEventListener('input', debounce(triggerUpdate, 100)));
+
     els.animSpeed.addEventListener('input', triggerUpdate);
 
     const updatePreviewEffects = () => {
@@ -487,14 +554,22 @@
 
         els.previewShadow.style.display = els.shadowCheck.checked ? 'block' : 'none';
 
+        // Глобальный шрифт
+        const selFont = els.globalFont.value;
+
+        // Логика Тултипа (Имени)
         if(els.tooltipInput.value.trim() !== '') {
             els.previewTooltip.textContent = els.tooltipInput.value;
+            els.previewTooltip.style.fontFamily = selFont;
+            els.previewTooltip.style.color = els.ttTextColor.value;
+            els.previewTooltip.style.backgroundColor = hexToRgba(els.ttBgColor.value, els.ttBgOpacity.value / 100);
+            els.previewTooltip.style.borderColor = els.ttTextColor.value; // бордер в цвет текста
             els.previewTooltip.classList.add('active');
         } else {
             els.previewTooltip.classList.remove('active');
         }
 
-        // Логика превью квеста
+        // Логика Квеста
         if(els.questTitle.value.trim() !== '' || els.questText.value.trim() !== '') {
             let t = els.questTitle.value || 'Задание';
             let d = els.questText.value.replace(/\n/g, '<br>') || 'Описание...';
@@ -502,6 +577,14 @@
             
             els.previewQuestBox.innerHTML = `<div class="quest-title">${t}</div><div class="quest-desc">${d}</div>${btn}`;
             els.previewQuestBox.className = `quest-${els.questStyle.value}`;
+            els.previewQuestBox.style.fontFamily = selFont;
+            els.previewQuestBox.style.color = els.qTextColor.value;
+            els.previewQuestBox.style.backgroundColor = hexToRgba(els.qBgColor.value, els.qBgOpacity.value / 100);
+            
+            // Красим кнопку в цвет фона, а текст кнопки в цвет текста квеста
+            let qb = els.previewQuestBox.querySelector('.quest-btn');
+            if(qb) { qb.style.color = els.qBgColor.value; qb.style.backgroundColor = els.qTextColor.value; }
+
             els.previewQuestBox.style.display = 'block';
         } else {
             els.previewQuestBox.style.display = 'none';
@@ -516,7 +599,9 @@
         if(ol) dropShadowCSS += `drop-shadow(2px 0 0 ${c}) drop-shadow(-2px 0 0 ${c}) drop-shadow(0 2px 0 ${c}) drop-shadow(0 -2px 0 ${c}) `;
         if(glowV > 0) dropShadowCSS += `drop-shadow(0 0 ${glowV}px ${glowC}) `;
         
-        els.canvas.style.filter = dropShadowCSS.trim();
+        // Устанавливаем базу для hover-blur через CSS переменную
+        els.canvas.style.setProperty('--base-filter', dropShadowCSS.trim() || 'none');
+        
         generateParticlesPreview();
     };
 
@@ -572,6 +657,8 @@
         els.audioInput.value = '';
         els.questTitle.value = '';
         els.questText.value = '';
+        els.ttBgOpacity.value = 80;
+        els.qBgOpacity.value = 95;
         triggerUpdate();
     });
 
@@ -653,11 +740,11 @@
                 finalImageSrc = els.canvas.toDataURL('image/webp', 0.8);
             }
 
+            const fontFam = els.globalFont.value;
             const cont = els.animContinuous.value;
             const hov = els.animHover.value;
             const clk = els.animClick.value;
             const speed = els.animSpeed.value;
-            const tooltip = els.tooltipInput.value.replace(/"/g, '&quot;');
             const audioStr = els.audioInput.value;
             
             let imgCssFilter = '';
@@ -671,9 +758,11 @@
             let glowC = els.glowColor.value;
             if(ol) imgCssFilter += `drop-shadow(2px 0 0 ${c}) drop-shadow(-2px 0 0 ${c}) drop-shadow(0 2px 0 ${c}) drop-shadow(0 -2px 0 ${c}) `;
             if(glowV > 0) imgCssFilter += `drop-shadow(0 0 ${glowV}px ${glowC}) `;
+            
+            imgCssFilter = imgCssFilter.trim();
 
             let scriptBlock = "";
-            let clickLogic = "e.stopPropagation(); "; // ЗАПРЕТИТЬ ПЕРЕХОД ДЛЯ GENIALLY
+            let clickLogic = "e.stopPropagation(); "; 
             
             if(clk !== 'none') {
                 let animName = clk.replace('click-', '');
@@ -685,57 +774,60 @@
                 if(animName === 'glitch') t = "0.3s linear infinite";
                 clickLogic += `this.style.animation = 'none'; void this.offsetWidth; this.style.animation = '${animName} ${t}'; setTimeout(() => { this.style.animation = ''; }, 1000); `;
             }
-            
             if(audioStr !== '') clickLogic += `new Audio('${audioStr}').play();`;
 
-            // ЛОГИКА КВЕСТОВ И ДИАЛОГОВ
+            // ТУЛТИП (ИМЯ)
+            const tooltip = els.tooltipInput.value.replace(/"/g, '&quot;');
+            const ttCol = els.ttTextColor.value;
+            const ttBg = hexToRgba(els.ttBgColor.value, els.ttBgOpacity.value / 100);
+            let tooltipHTML = tooltip ? `<div class="g-tt">${tooltip}</div>` : '';
+
+            // КВЕСТЫ
             const qTitle = els.questTitle.value.replace(/"/g, '&quot;');
             const qText = els.questText.value.replace(/\n/g, '<br>').replace(/"/g, '&quot;');
             const qTrig = els.questTrigger.value;
             const qStyle = els.questStyle.value;
+            const qTCol = els.qTextColor.value;
+            const qBg = hexToRgba(els.qBgColor.value, els.qBgOpacity.value / 100);
 
             let questHTML = '';
             let questCSS = '';
             
             if(qTitle !== '' || qText !== '') {
-                let btnHTML = qTrig === 'click' ? '<button class="q-btn" onclick="document.getElementById(\'q-box\').classList.remove(\'show\'); event.stopPropagation();">Принять</button>' : '';
-                questHTML = `<div id="q-box" class="q-box q-${qStyle}"><div class="q-title">${qTitle}</div><div class="q-desc">${qText}</div>${btnHTML}</div>`;
+                let btnHTML = qTrig === 'click' ? `<button class="q-btn" style="color:${els.qBgColor.value}; background:${qTCol};" onclick="document.getElementById('q-box').classList.remove('show'); event.stopPropagation();">Принять</button>` : '';
+                questHTML = `<div id="q-box" class="q-box q-${qStyle}" style="color:${qTCol}; background:${qBg};"><div class="q-title">${qTitle}</div><div class="q-desc">${qText}</div>${btnHTML}</div>`;
                 
                 questCSS += `
-                .q-box { position: absolute; z-index: 20; padding: 15px; border-radius: 8px; width: 220px; text-align: left; opacity: 0; pointer-events: none; transition: 0.3s; font-family: sans-serif; box-sizing: border-box;}
-                .q-title { font-weight: bold; margin-bottom: 8px; font-size: 16px; }
-                .q-desc { font-size: 13px; line-height: 1.4; word-wrap: break-word;}
+                .q-box { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.9); z-index: 20; padding: 15px; border-radius: 8px; width: 280px; text-align: left; opacity: 0; pointer-events: none; transition: 0.3s; font-family: ${fontFam}; box-sizing: border-box; display: none;}
+                .q-title { font-weight: bold; margin-bottom: 8px; font-size: 16px; text-align: center;}
+                .q-desc { font-size: 13px; line-height: 1.4; word-wrap: break-word; max-height: 250px; overflow-y: auto; padding-right:5px;}
+                .q-desc::-webkit-scrollbar { width: 4px; } .q-desc::-webkit-scrollbar-thumb { background: ${qTCol}; border-radius: 4px; }
                 .q-btn { margin-top: 10px; padding: 8px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; width: 100%; transition: 0.3s;}
                 
-                .q-fantasy { background: #e8dcc4; color: #4a3b22; border: 2px solid #8b6d43; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); font-family: 'Cormorant Garamond', serif; }
+                .q-fantasy { border: 2px solid #8b6d43; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
                 .q-fantasy .q-title { border-bottom: 1px solid #8b6d43; padding-bottom: 5px; }
-                .q-fantasy .q-btn { background: #8b6d43; color: #e8dcc4; }
                 
-                .q-cyberpunk { background: rgba(10, 10, 20, 0.9); color: #0ff; border: 1px solid #0ff; box-shadow: 0 0 10px #0ff; text-transform: uppercase; letter-spacing: 1px; font-family: monospace; }
+                .q-cyberpunk { border: 1px solid #0ff; box-shadow: 0 0 10px #0ff; text-transform: uppercase; letter-spacing: 1px; border-radius: 0 !important; }
                 .q-cyberpunk .q-title { border-bottom: 1px dashed #0ff; padding-bottom: 5px; text-shadow: 0 0 5px #0ff; }
-                .q-cyberpunk .q-btn { background: #0ff; color: #000; box-shadow: 0 0 5px #0ff; }
+                .q-cyberpunk .q-btn { border-radius: 0 !important; }
                 
-                .q-rpg { background: rgba(30, 30, 30, 0.9); color: #dfb23e; border: 2px solid #dfb23e; border-radius: 0; box-shadow: inset 0 0 10px #000; }
+                .q-rpg { border: 2px solid #dfb23e; border-radius: 0 !important; box-shadow: inset 0 0 10px #000; }
                 .q-rpg .q-title { border-bottom: 2px solid #dfb23e; padding-bottom: 5px; }
-                .q-rpg .q-btn { background: transparent; border: 1px solid #dfb23e; color: #dfb23e; }
-                .q-rpg .q-btn:hover { background: #dfb23e; color: #000; }
                 `;
                 
                 if(qTrig === 'hover') {
                     questCSS += `
-                    .q-box { left: 80%; top: 10%; display: block;}
-                    #g-img:hover ~ .q-box { opacity: 1; transform: translateX(10px); }
+                    .q-box { display: block; }
+                    .g-wrap:hover .q-box { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
                     `;
                 } else {
                     questCSS += `
-                    .q-box { left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.9); display: none; text-align: center;}
                     .q-box.show { display: block; opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
                     `;
                     clickLogic += `document.getElementById('q-box').classList.add('show'); `;
                 }
             }
 
-            // Скрипт
             scriptBlock = `\n<script>document.getElementById('g-img').addEventListener('click', function(e) { ${clickLogic} });<\/script>`;
 
             let shadowHTML = els.shadowCheck.checked ? '<div class="g-shadow"></div>' : '';
@@ -756,23 +848,21 @@
                 particlesHTML += '</div>';
             }
 
-            let tooltipHTML = tooltip ? `<div class="g-tt">${tooltip}</div>` : '';
-
-            // ФИНАЛЬНЫЙ HTML КОД. ОЧИЩЕН ОТ pointer-events: none на body
             const geniallyCode = `<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Montserrat:wght@400;600&family=Cinzel:wght@700&family=Courier+Prime:wght@700&family=Oswald:wght@500&family=Playfair+Display:wght@700&family=Roboto:wght@500&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
 <style>
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; font-family: sans-serif; }
-  .g-cont { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; position: relative; --anim-speed: ${speed}s; }
-  .g-wrap { position: relative; display: inline-flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+  .g-cont { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; position: relative; --anim-speed: ${speed}s; --base-filter: ${imgCssFilter || 'none'};}
+  .g-wrap { position: relative; display: inline-flex; justify-content: center; align-items: center; width: 100%; height: 100%; font-family: ${fontFam}; }
   
-  #g-img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: pointer; transition: 0.3s ease; position: relative; z-index: 5; filter: ${imgCssFilter || 'none'}; }
+  #g-img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: pointer; transition: 0.3s ease; position: relative; z-index: 5; filter: var(--base-filter); }
   
   .g-shadow { position: absolute; bottom: 5%; width: 50%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, transparent 70%); border-radius: 50%; z-index: 1; pointer-events: none; }
   
-  .g-tt { position: absolute; top: 10%; background: rgba(0,0,0,0.8); border: 1px solid ${glowC}; color: ${glowC}; padding: 5px 15px; border-radius: 5px; font-size: 14px; font-weight: bold; opacity: 0; transition: 0.3s; z-index: 10; pointer-events: none; transform: translateY(10px); text-align: center;}
+  .g-tt { position: absolute; top: 10%; background: ${ttBg}; color: ${ttCol}; border: 1px solid ${ttCol}; padding: 5px 15px; border-radius: 5px; font-size: 14px; font-weight: bold; opacity: 0; transition: 0.3s; z-index: 10; pointer-events: none; transform: translateY(10px); text-align: center;}
   #g-img:hover ~ .g-tt { opacity: 1; transform: translateY(0); }
   
   .p-wrap { position: absolute; width: 100%; height: 100%; top:0; left:0; z-index: 2; pointer-events: none; overflow: hidden; }
@@ -780,7 +870,6 @@
 
   ${questCSS}
 
-  /* --- ВСЕ КЛАССЫ АНИМАЦИЙ --- */
   .anim-float { animation: float var(--anim-speed) ease-in-out infinite; }
   .anim-pulse { animation: pulse calc(var(--anim-speed) / 1.5) infinite; }
   .anim-breathe { animation: breathe var(--anim-speed) ease-in-out infinite; }
@@ -793,27 +882,26 @@
   .anim-ghost { animation: ghost var(--anim-speed) infinite alternate; }
   
   .hover-zoom:hover { transform: scale(1.15); }
-  .hover-blur:hover { filter: blur(5px); }
+  .hover-blur:hover { filter: var(--base-filter) blur(5px) !important; }
   .hover-tilt:hover { transform: rotate(15deg) scale(1.05); }
   .hover-squeeze:hover { transform: scaleY(0.8) scaleX(1.2); }
   .hover-neon:hover { animation: neon calc(var(--anim-speed) / 2) alternate infinite; }
   .hover-shake:hover { animation: shake 0.3s infinite; }
 
-  /* --- ВСЕ КЛЮЧЕВЫЕ КАДРЫ --- */
   @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-  @keyframes pulse { 0%, 100% { transform: scale(1); filter: brightness(100%);} 50% { transform: scale(1.08); filter: brightness(130%); } }
+  @keyframes pulse { 0%, 100% { transform: scale(1); filter: var(--base-filter) brightness(100%);} 50% { transform: scale(1.08); filter: var(--base-filter) brightness(130%); } }
   @keyframes breathe { 0%, 100% { transform: scaleY(1) scaleX(1); } 50% { transform: scaleY(1.05) scaleX(0.98); } }
   @keyframes wobble { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
   @keyframes bounce { 0% { transform: translateY(0); } 40% { transform: translateY(-60px) scaleY(1.1); } 100% { transform: translateY(0) scaleY(1); } }
   @keyframes spin { 100% { transform: rotate(360deg); } }
-  @keyframes neon { 0% { filter: brightness(100%) drop-shadow(0 0 5px ${glowC}); } 100% { filter: brightness(150%) drop-shadow(0 0 20px ${glowC}); } }
+  @keyframes neon { 0% { filter: var(--base-filter) drop-shadow(0 0 5px ${glowC}); } 100% { filter: var(--base-filter) drop-shadow(0 0 20px ${glowC}); } }
   @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
   @keyframes squish { 0%, 100% { transform: scale(1); } 50% { transform: scaleY(0.4) scaleX(1.5) translateY(30%); } }
   @keyframes vanish { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(2); } }
   @keyframes flip { 0% { transform: perspective(400px) rotateY(0deg); } 100% { transform: perspective(400px) rotateY(360deg); } }
   @keyframes glitch { 0% { transform: translate(0) } 20% { transform: translate(-3px, 3px) } 40% { transform: translate(-3px, -3px) } 60% { transform: translate(3px, 3px) } 80% { transform: translate(3px, -3px) } 100% { transform: translate(0) } }
   @keyframes swing { 20% { transform: rotate(15deg); } 40% { transform: rotate(-10deg); } 60% { transform: rotate(5deg); } 80% { transform: rotate(-5deg); } 100% { transform: rotate(0deg); } }
-  @keyframes ghost { 0% { opacity: 1; filter: grayscale(0%);} 100% { opacity: 0.3; filter: grayscale(80%) blur(2px);} }
+  @keyframes ghost { 0% { opacity: 1; filter: var(--base-filter) grayscale(0%);} 100% { opacity: 0.3; filter: var(--base-filter) grayscale(80%) blur(2px);} }
 </style>
 </head>
 <body>
